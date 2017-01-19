@@ -1,0 +1,72 @@
+finish F_Glass1
+specular 1
+roughness 0.001
+ambient 0
+diffuse 0
+refraction 1
+reflection 0.1
+ior 1.5
+end
+
+finish F_Glass2
+ambient 0
+diffuse 0
+reflection 0.5
+refraction 1
+ior 1.5
+phong 0.3
+phong_size 60
+end
+
+finish F_Glass3
+ambient 0.1
+diffuse 0.1
+reflection 0.1
+refraction 1
+ior 1.45
+specular 0.8
+roughness 0.003
+phong 1
+phong_size 400
+end
+
+finish F_Glass4
+ambient 0.1
+diffuse 0.1
+reflection .25
+refraction 1
+ior 1.5
+specular 1
+roughness 0.001
+end
+
+pigment P_Glass1
+color 1.0 1.0 1.0 0.7 0.0
+end
+
+pigment P_Glass2
+color 1.0 1.0 1.0 1.0 0.0
+end
+
+pigment P_Glass4
+color 0.98 0.98 0.98 0.9 0.0
+end
+
+texture T_Glass1
+comment Simple clear glass
+pigment P_Glass1
+finish F_Glass1
+end
+
+texture T_Glass2
+comment More like an acrylic plastic
+pigment P_Glass2
+finish F_Glass2
+end
+
+texture T_Glass3
+comment An excellent lead crystal glass!
+pigment 
+finish F_Glass3
+end
+

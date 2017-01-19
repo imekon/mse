@@ -1,0 +1,4 @@
+Model Scene Editor is an editor for creating
+scenes in POVray V3.0, V3.1.
+
+Copyright (c) 1996, 2000 Pete Goodwin

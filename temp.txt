@@ -1,0 +1,59 @@
+procedure TMainForm.NewTextBtnClick(Sender: TObject);
+var
+  dlg: TTextTypeDlg;
+  id: TTextureID;
+  name: string;
+
+begin
+  dlg := TTextTypeDlg.Create(Application);
+
+  if dlg.ShowModal = idOK then
+  begin
+    name := LowerCase(dlg.TypeList.Items[dlg.TypeList.ItemIndex]);
+    for id := tiTexture to tiLastTexture do
+      if TextureNames[id] = name then
+      begin
+        CreateTextureFromID(id);
+        break;
+      end;
+  end;
+
+  dlg.Free;
+end;
+
+procedure TMainForm.EditTextBtnClick(Sender: TObject);
+begin
+  if CurrentTexture <> nil then
+    if CurrentTexture.Edit then
+      ModifiedTextures := True;
+end;
+
+procedure TMainForm.FindTextureItemClick(Sender: TObject);
+var
+  dlg: TFindTextureDialog;
+  texture: TTexture;
+
+begin
+  dlg := TFindTextureDialog.Create(Application);
+  if dlg.ShowModal = idOK then
+  begin
+    texture := FindTexture(dlg.Name.Text);
+    if texture <> nil then
+      SetTexture(texture);
+  end;
+  dlg.Free;
+end;
+
+procedure TMainForm.DeleteTextBtnClick(Sender: TObject);
+begin
+  if (CurrentTexture <> nil) and
+    (MessageDlg('Delete texture ' + CurrentTexture.Name + '?', mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
+  begin
+    Textures.Remove(CurrentTexture);
+    CurrentTexture.Free;
+    CurrentTexture := nil;
+    TextPaintBox.Width := Textures.Count * TextSize;
+    TextPaintBox.Refresh;
+  end;
+end;
+

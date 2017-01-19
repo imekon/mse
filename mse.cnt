@@ -1,0 +1,39 @@
+; This contents file was created with HelpScribble 5.5.2
+; Registered to: Pete Goodwin
+
+:BASE mse.hlp
+:TITLE Model Scene Editor
+:LINK DEL5VCL.HLP
+1 Contents
+2 Model Scene Editor=Scribble10
+2 Introduction=Scribble21
+1 Shapes
+2 Camera=Scribble37
+2 Light Source=Scribble38
+2 Plane Object=Scribble39
+2 Sphere Object=Scribble40
+2 Cube Object=Scribble41
+2 Solid Object=Scribble42
+2 Lathe Object=Scribble43
+2 Polygon Object=Scribble44
+2 Extrusion=Scribble45
+2 Disc Object=Scribble46
+2 Torus Object=Scribble47
+2 Heightfield Object=Scribble48
+2 Bicubic Patch Object=Scribble49
+2 Super Ellipsoid Object=Scribble50
+2 Text Object=Scribble51
+2 User Defined Object=Scribble52
+1 Textures
+2 Textures=Scribble12
+2 Texture Palette=Scribble19
+2 Texture menu=Scribble24
+2 Create Texture=Scribble54
+2 Brick Texture=Scribble57
+2 Colour Texture=Scribble59
+2 Checker Texture=Scribble56
+2 Colour Map Texture=Scribble55
+2 Normal Texture=Scribble60
+2 Finish Texture=Scribble61
+2 Halo Texture=Scribble63
+2 Texture Transformations=Scribble73

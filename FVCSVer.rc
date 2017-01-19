@@ -1,0 +1,30 @@
+1 VERSIONINFO LOADONCALL MOVEABLE DISCARDABLE IMPURE
+FILEVERSION 0,4,13,549
+PRODUCTVERSION 0,4,13,549
+FILEOS VOS__WINDOWS32
+FILETYPE VFT_APP
+{
+ BLOCK "StringFileInfo"
+ {
+  BLOCK "080904E4"
+  {
+   VALUE "CompanyName", "Pete Goodwin\000"
+   VALUE "FileDescription", "Model Scene Editor\000"
+   VALUE "FileVersion", "0.4.13.549\000"
+   VALUE "ProductVersion", "0.4.13.549\000"
+   VALUE "InternalName", "model.dpr\000"
+   VALUE "OriginalFilename", "Model.exe\000"
+   VALUE "LegalCopyright", "Copyright © 1996, 2000 Pete Goodwin\000"
+   VALUE "ProductName", "Model Scene Editor\000"
+   VALUE "LegalTrademarks", "All rights reserved\000"
+   VALUE "Author", "Pete Goodwin\000"
+   VALUE "BuildType", "ReleaseBuild\000"
+   VALUE "BuildTimestamp", "14/10/00 09:07:02 PM\000"
+   VALUE "VCS", "FreeVCS  http://www.freevcs.de\000"
+  }
+ }
+ BLOCK "VarFileInfo"
+ {
+  VALUE "Translation", 0x0809,1252
+ }
+}
