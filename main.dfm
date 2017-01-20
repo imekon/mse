@@ -1929,7 +1929,7 @@ object MainForm: TMainForm
   end
   object OpenDialog: TOpenDialog
     Filter = 'All Files (*.*)|*.*'
-    Left = 431
+    Left = 415
     Top = 78
   end
   object SaveDialog: TSaveDialog
@@ -1940,8 +1940,8 @@ object MainForm: TMainForm
   end
   object LightPopup: TPopupMenu
     AutoPopup = False
-    Left = 51
-    Top = 170
+    Left = 107
+    Top = 122
     object PointPopup: TMenuItem
       Caption = '&Point'
       Hint = 'Create a point light source'
@@ -1972,12 +1972,12 @@ object MainForm: TMainForm
     end
   end
   object PrintDialog: TPrintDialog
-    Left = 347
-    Top = 123
+    Left = 411
+    Top = 139
   end
   object PrinterSetupDialog: TPrinterSetupDialog
-    Left = 379
-    Top = 123
+    Left = 467
+    Top = 139
   end
   object ActionList: TActionList
     Images = ImageList
@@ -2192,7 +2192,7 @@ object MainForm: TMainForm
     Left = 195
     Top = 127
     Bitmap = {
-      494C0101140018000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010114001800100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000006000000001002000000000000060
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

@@ -21,8 +21,12 @@ unit Texture;
 interface
 
 uses
-    Windows, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-    StdCtrls, Dialogs, Buttons, Messages, Vector;
+  System.JSON, System.TypInfo,
+    System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Forms,
+    Vcl.Controls, Vcl.Menus,
+    Vcl.StdCtrls, Vcl.Dialogs, Vcl.Buttons,
+    Winapi.Windows, Winapi.Messages,
+    Vector;
 
 const
   TextSize = 20;                    // Texture rectangle size
@@ -96,6 +100,7 @@ type
     function GetID: TTextureID; virtual;
     procedure SaveToFile(dest: TStream); virtual;
     procedure LoadFromFile(source: TStream); virtual;
+    procedure Save(parent: TJSONArray); virtual;
     function GetColour: TColor; virtual;
     function GetPaletteRGB: Longint; virtual;
     function ConvertPaletteRGB(r, g, b: double): longint; virtual;
@@ -124,6 +129,7 @@ type
     MapType: integer;
     constructor Create; override;
     function GetID: TTextureID; override;
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
   end;
@@ -133,6 +139,7 @@ type
     Declare, Filename: AnsiString;
     constructor Create; override;
     function GetID: TTextureID; override;
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
@@ -287,6 +294,72 @@ begin
     Brush.Color := GetPaletteRGB;
     FillRect(rect);
   end;
+end;
+
+procedure TTexture.Save(parent: TJSONArray);
+var
+  child, haloObj: TJSONObject;
+  halosArray: TJSONArray;
+  i, n: integer;
+  t: TTextureID;
+  halo: THalo;
+
+begin
+  child := TJSONObject.Create;
+  t := GetID;
+  child.AddPair('type', TJSONNumber.Create(ord(t)));
+  child.AddPair('category', Category);
+  child.AddPair('name', Name);
+  Translate.Save('translate', child);
+  Scale.Save('scale', child);
+  Rotate.Save('rotate', child);
+  child.AddPair('red', TJSONNumber.Create(Red));
+  child.AddPair('green', TJSONNumber.Create(Green));
+  child.AddPair('blue', TJSONNumber.Create(Blue));
+  child.AddPair('filter', TJSONNumber.Create(Filter));
+  child.AddPair('transmit', TJSONNumber.Create(Transmit));
+  child.AddPair('diffuse', TJSONNumber.Create(Diffuse));
+  child.AddPair('brilliance', TJSONNumber.Create(Brilliance));
+  child.AddPair('crand', TJSONNumber.Create(Crand));
+  child.AddPair('ambient', TJSONNumber.Create(Ambient));
+  child.AddPair('reflection', TJSONNumber.Create(Reflection));
+  child.AddPair('phong', TJSONNumber.Create(Phong));
+  child.AddPair('phongsize', TJSONNumber.Create(PhongSize));
+  child.AddPair('specular', TJSONNumber.Create(Specular));
+  child.AddPair('roughness', TJSONNumber.Create(Roughness));
+  child.AddPair('refraction', TJSONNumber.Create(Refraction));
+  child.AddPair('ior', TJSONNumber.Create(IOR));
+  child.AddPair('metallic', TJSONBool.Create(Metallic));
+  child.AddPair('caustics', TJSONNumber.Create(Caustics));
+  child.AddPair('fadedistance', TJSONNumber.Create(FadeDistance));
+  child.AddPair('fadepower', TJSONNumber.Create(FadePower));
+  child.AddPair('irid', TJSONNumber.Create(Irid));
+  child.AddPair('iridthickness', TJSONNumber.Create(IridThickness));
+  IridVector.Save('iridvector', child);
+  child.AddPair('turbulence', TJSONNumber.Create(Turbulence));
+  child.AddPair('octaves', TJSONNumber.Create(Octaves));
+  child.AddPair('lambda', TJSONNumber.Create(Lambda));
+  child.AddPair('omega', TJSONNumber.Create(Omega));
+  child.AddPair('normaltype', TJSONNumber.Create(ord(NormalType)));
+  child.AddPair('normalvalue', TJSONNumber.Create(NormalValue));
+  child.AddPair('normalturbulence', TJSONNumber.Create(NormalTurbulence));
+  child.AddPair('normaloctaves', TJSONNumber.Create(NormalOctaves));
+  child.AddPair('normallambda', TJSONNumber.Create(NormalLambda));
+  child.AddPair('normalomega', TJSONNumber.Create(NormalOmega));
+
+  halosArray := TJSONArray.Create;
+  n := Halos.Count;
+  for i := 0 to n - 1 do
+  begin
+    halo := Halos[i];
+    haloObj := TJSONObject.Create;
+    haloObj.AddPair('halo', halo.Name);
+    halosArray.Add(haloObj);
+  end;
+
+  child.AddPair('halos', halosArray);
+
+  parent.Add(child);
 end;
 
 procedure TTexture.SaveToFile(dest: TStream);
@@ -666,6 +739,19 @@ begin
   result := tiImage;
 end;
 
+procedure TImageTexture.Save(parent: TJSONArray);
+var
+  child: TJSONObject;
+
+begin
+  inherited;
+
+  child := TJSONObject.Create;
+  child.AddPair('maptype', TJSONNumber.Create(ord(MapType)));
+  child.AddPair('filename', Filename);
+  parent.Add(child);
+end;
+
 procedure TImageTexture.SaveToFile(dest: TStream);
 begin
   inherited;
@@ -694,6 +780,19 @@ end;
 function TUserTexture.GetID: TTextureID;
 begin
   result := tiUser;
+end;
+
+procedure TUserTexture.Save(parent: TJSONArray);
+var
+  child: TJSONObject;
+
+begin
+  inherited;
+
+  child := TJSONObject.Create;
+  child.AddPair('declare', Declare);
+  child.AddPair('filename', Filename);
+  parent.Add(child);
 end;
 
 procedure TUserTexture.SaveToFile(dest: TStream);

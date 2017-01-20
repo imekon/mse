@@ -20,7 +20,7 @@ unit vector;
 
 interface
 
-uses Classes;
+uses System.JSON, Classes;
 
 type
   TVector = class(TObject)
@@ -28,6 +28,7 @@ type
       X, Y, Z: double;
       constructor Create; virtual;
       procedure Copy(original: TVector);
+      procedure Save(const name: string; parent: TJSONobject);
       procedure SaveToFile(dest: TStream);
       procedure LoadFromFile(source: TStream);
       function Magnitude: double;
@@ -61,6 +62,18 @@ begin
   X := original.X;
   Y := original.Y;
   Z := original.Z;
+end;
+
+procedure TVector.Save(const name: string; parent: TJSONobject);
+var
+  obj: TJSONobject;
+
+begin
+  obj := TJSONobject.Create;
+  obj.AddPair('x', TJSONNumber.Create(x));
+  obj.AddPair('y', TJSONNumber.Create(y));
+  obj.AddPair('z', TJSONNumber.Create(z));
+  parent.AddPair(name, obj);
 end;
 
 procedure TVector.SaveToFile(dest: TStream);

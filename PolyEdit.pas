@@ -14,14 +14,14 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit PolyEdit;
 
 interface
 
 uses
-  System.Contnrs,
+  System.Contnrs, System.UITypes, System.Types,
   Windows, Messages, SysUtils, Math, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, Tabs, StdCtrls, Menus, Clipbrd, Vector, Scene, Polygon, Buttons,
   ToolWin, ComCtrls;

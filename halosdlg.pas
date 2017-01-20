@@ -14,13 +14,15 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit halosdlg;
 
 interface
 
-uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
+uses
+  System.UITypes,
+  Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, Dialogs;
 
 type

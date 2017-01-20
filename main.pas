@@ -14,13 +14,15 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit main;
 
 interface
 
-uses Windows, Messages, SysUtils, Classes, Graphics, Forms, Controls, Menus,
+uses
+  System.UITypes, System.Contnrs, System.IOUtils, System.JSON,
+  Windows, Messages, SysUtils, Classes, Graphics, Forms, Controls, Menus,
   Dialogs, StdCtrls, Buttons, ExtCtrls, ComCtrls, Registry, Texture, Halo, Tabs,
   Scene, ToolWin, ImgList, ActnList, System.ImageList, System.Actions;
 
@@ -1956,28 +1958,24 @@ procedure TMainForm.SaveTextures(const Name: string);
 var
   i, n: integer;
   texture: TTexture;
-  dest: TFileStream;
-  buffer: array [0..4] of char;
+  root: TJSONObject;
+  scene: TJSONArray;
+  text: string;
 
 begin
-  dest := TFileStream.Create(Name, fmOpenWrite or fmCreate);
-  try
-    buffer := 'MODL';
-    dest.WriteBuffer(buffer, 4);
-    TextureVersion := ModelVersion;
-    dest.WriteBuffer(TextureVersion, sizeof(TextureVersion));
-    
-    n := Textures.Count;
-    dest.WriteBuffer(n, sizeof(n));
-    for i := 0 to n - 1 do
-    begin
-      texture := Textures[i];
-      texture.SaveToFile(dest);
-    end;
-  finally
-    dest.Free;
-    ModifiedTextures := False;
+  root := TJSONObject.Create;
+  scene := TJSONArray.Create;
+  n := Textures.Count;
+  for i := 0 to n - 1 do
+  begin
+    texture := Textures[i];
+    texture.Save(scene);
   end;
+  root.AddPair('textures', scene);
+  text := root.ToJSON;
+  TFile.WriteAllText(name, text);
+
+  ModifiedTextures := False;
 end;
 
 procedure TMainForm.LoadTexturesItemClick(Sender: TObject);

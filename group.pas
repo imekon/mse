@@ -14,7 +14,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 ////////////////////////////////////////////////////////////////////////////////
 //  The Group shape
@@ -30,6 +30,7 @@ unit group;
 interface
 
 uses
+  System.Types,
   Windows, SysUtils, Classes, Graphics, Forms, Controls, Menus,
   StdCtrls, ComCtrls, Dialogs, Buttons, Messages, Vector, Texture, Scene,
   DirectX, Contnrs;

@@ -122,13 +122,13 @@ object PolyEditor: TPolyEditor
         Control = Toolbar
         ImageIndex = -1
         MinHeight = 33
-        Width = 692
+        Width = 697
       end
       item
         Control = EditBar
         ImageIndex = -1
         MinHeight = 33
-        Width = 692
+        Width = 697
       end>
     object Toolbar: TPanel
       Left = 11

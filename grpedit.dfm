@@ -43,12 +43,12 @@ object GroupEditor: TGroupEditor
       item
         Control = ToolPanel
         ImageIndex = -1
-        Width = 674
+        Width = 679
       end
       item
         Control = EditPanel
         ImageIndex = -1
-        Width = 674
+        Width = 679
       end>
     object ToolPanel: TPanel
       Left = 11

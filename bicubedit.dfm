@@ -122,13 +122,13 @@ object BicubicEditor: TBicubicEditor
         Control = ButtonBar
         ImageIndex = -1
         MinHeight = 33
-        Width = 560
+        Width = 565
       end
       item
         Control = EditBar
         ImageIndex = -1
         MinHeight = 32
-        Width = 560
+        Width = 565
       end>
     object ButtonBar: TPanel
       Left = 11

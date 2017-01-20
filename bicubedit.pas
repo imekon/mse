@@ -14,13 +14,14 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit bicubedit;
 
 interface
 
 uses
+  System.UITypes, System.Types,
   Windows, Messages, SysUtils, Math, Classes, Graphics, Controls, Forms, Dialogs,
   Tabs, StdCtrls, Buttons, ExtCtrls, Menus, Vector, Scene, Bicubic, ComCtrls,
   ToolWin;

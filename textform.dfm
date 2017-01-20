@@ -78,7 +78,7 @@ object TextureForm: TTextureForm
     object UserSheet: TTabSheet
       Caption = 'User'
       ImageIndex = 7
-      ExplicitHeight = 491
+      ExplicitHeight = 132
       object Label3: TLabel
         Left = 8
         Top = 8
@@ -176,6 +176,7 @@ object TextureForm: TTextureForm
     end
     object ColourSheet: TTabSheet
       Caption = 'Colour'
+      ExplicitHeight = 132
       object Label1: TLabel
         Left = 8
         Top = 8
@@ -240,6 +241,10 @@ object TextureForm: TTextureForm
     end
     object MapSheet: TTabSheet
       Caption = 'Map'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label32: TLabel
         Left = 8
         Top = 8
@@ -475,6 +480,7 @@ object TextureForm: TTextureForm
     end
     object CheckerSheet: TTabSheet
       Caption = 'Checker'
+      ExplicitHeight = 132
       object Label39: TLabel
         Left = 8
         Top = 8
@@ -1221,7 +1227,7 @@ object TextureForm: TTextureForm
     Left = 96
     Top = 162
     Bitmap = {
-      494C010105000900080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101050009000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
