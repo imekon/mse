@@ -14,13 +14,13 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit vector;
 
 interface
 
-uses System.JSON, Classes;
+uses System.JSON, System.Classes;
 
 type
   TVector = class(TObject)
@@ -28,9 +28,9 @@ type
       X, Y, Z: double;
       constructor Create; virtual;
       procedure Copy(original: TVector);
-      procedure Save(const name: string; parent: TJSONobject);
-      procedure SaveToFile(dest: TStream);
-      procedure LoadFromFile(source: TStream);
+      procedure Save(const name: string; parent: TJSONobject); virtual;
+      procedure SaveToFile(dest: TStream); virtual;
+      procedure LoadFromFile(source: TStream); virtual;
       function Magnitude: double;
       procedure Normalize;
       function Equal(xx, yy, zz: double): boolean;

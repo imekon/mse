@@ -14,14 +14,16 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit brick;
 
 interface
 
 uses
-  Windows, Classes, SysUtils, Graphics, Forms, Vector, Texture;
+  System.JSON,
+  Winapi.Windows, System.Classes, System.SysUtils, VCL.Graphics, VCL.Forms,
+  Vector, Texture;
 
 type
   TBrickTexture = class(TTexture)
@@ -33,6 +35,7 @@ type
 
     constructor Create; override;
     function GetID: TTextureID; override;
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
@@ -64,6 +67,21 @@ end;
 function TBrickTexture.GetID: TTextureID;
 begin
   result := tiBrick;
+end;
+
+procedure TBrickTexture.Save(parent: TJSONArray);
+var
+  child: TJSONObject;
+
+begin
+  inherited;
+  child := TJSONObject.Create;
+  child.AddPair('red2', TJSONNumber.Create(Red2));
+  child.AddPair('green2', TJSONNumber.Create(Green2));
+  child.AddPair('blue2', TJSONNumber.Create(Blue2));
+  child.AddPair('filter2', TJSONNumber.Create(Filter2));
+  child.AddPair('transmit2', TJSONNumber.Create(Transmit2));
+  parent.Add(child);
 end;
 
 procedure TBrickTexture.SaveToFile(dest: TStream);

@@ -21,7 +21,7 @@ unit torus;
 interface
 
 uses
-  System.UITypes,
+  System.UITypes, System.JSON,
     WinTypes, WinProcs, SysUtils, Classes, Graphics, Forms, Controls, Menus,
     StdCtrls, Dialogs, Buttons, Messages, Vector, Scene;
 
@@ -36,6 +36,7 @@ type
     procedure Generate(var dest: TextFile); override;
     procedure Details; override;
     procedure LoadFromFile(source: TStream); override;
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure Build;
   end;
@@ -114,6 +115,19 @@ begin
   source.ReadBuffer(Sturm, sizeof(Sturm));
 
   Build;
+end;
+
+procedure TTorus.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  obj.AddPair('major', TJSONNumber.Create(Major));
+  obj.AddPair('minor', TJSONNumber.Create(Minor));
+  obj.AddPair('sturm', TJSONBool.Create(Sturm));
+  parent.Add(obj);
 end;
 
 procedure TTorus.SaveToFile(dest: TStream);

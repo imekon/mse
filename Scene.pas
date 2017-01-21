@@ -14,16 +14,17 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit Scene;
 
 interface
 
 uses
-  System.Types, System.UITypes,
-  Winapi.Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, Clipbrd, Math, Vector, Texture, Matrix, DirectX, Contnrs;
+  System.Types, System.UITypes, System.JSON, System.IOUtils,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, VCL.Graphics,
+  VCL.Controls, VCL.Forms, VCL.Dialogs,
+  VCL.ComCtrls, VCL.Clipbrd, System.Math, Vector, Texture, Matrix, System.Contnrs;
 
 const
   d2r = pi / 180.0;
@@ -110,6 +111,7 @@ type
       procedure Draw(canvas: TCanvas);
       procedure DrawFilled(scene: TSceneData; canvas: TCanvas);
       procedure DrawPolygon(scene: TSceneData; canvas: TCanvas; view: TView);
+      procedure Save(const name: string; parent: TJSONArray);
       procedure SaveToFile(dest: TStream);
       procedure LoadFromFile(source: TStream);
       function HasAllSelected: boolean;
@@ -124,7 +126,6 @@ type
       procedure GenerateUDO(var dest: TextFile);
       procedure GenerateUDOInclude(var dest: TextFile);
       procedure GenerateDirectXFile(var dest: TextFile; const Options: TExportOptions);
-      procedure GenerateDirectXForm(D3DRM: IDirect3DRM; MeshBuilder: IDirect3DRMMeshBuilder);
     end;
 
   // Scene layers
@@ -133,6 +134,7 @@ type
     Name: AnsiString;
     Visible, Selectable: boolean;
     constructor Create;
+    procedure Save(parent: TJSONArray);
     procedure SaveToFile(dest: TStream);
     procedure LoadFromFile(source: TStream);
   end;
@@ -231,6 +233,7 @@ type
       function GetObserved: TVector; virtual;
       procedure AddTriangle(i, j, k: TVector);
       procedure ResetTriangleSelection;
+      procedure Save(parent: TJSONArray); virtual;
       procedure SaveToFile(dest: TStream); virtual;
       procedure LoadFromFile(source: TStream); virtual;
       procedure GenerateDetails(var dest: TextFile); virtual;
@@ -245,9 +248,6 @@ type
       procedure GenerateUDO(var dest: TextFile); virtual;
       procedure GenerateUDOInclude(var dest: TextFile); virtual;
       procedure GenerateDirectXFile(var dest: TextFile; const Options: TExportOptions); virtual;
-      procedure GenerateDirectXForm(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame); virtual;
-      procedure GenerateDirectXDetails(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame); virtual;
-      procedure GenerateDirectXTransforms(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame); virtual;
       procedure GenerateBlob(var dest: TextFile); virtual;
       function CreateQuery: boolean; virtual;
       procedure Details; virtual;
@@ -278,6 +278,7 @@ type
     function GetObserved: TVector; override;
     procedure Draw(Scene: TSceneData; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); override;
     procedure Make(scene: TSceneData; theTriangles: TList); override;
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
@@ -307,6 +308,7 @@ type
     Red, Green, Blue: double;
 
     constructor Create;
+    procedure Save(parent: TJSONArray);
     procedure SaveToFile(stream: TStream);
     procedure LoadFromFile(stream: TStream);
   end;
@@ -327,6 +329,7 @@ type
     Alt: double;
 
     constructor Create;
+    procedure Save(parent: TJSONArray);
     procedure SaveToFile(stream: TStream);
     procedure LoadFromFile(stream: TStream);
   end;
@@ -375,7 +378,8 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Load(const name: string);
-    procedure Save(const name: string);
+    procedure Save(parent: TJSONArray); overload;
+    procedure Save(const name: string); overload;
     procedure Edit;
   end;
 
@@ -478,6 +482,7 @@ type
     function DragOver(X, Y: integer): boolean;
     procedure EndDrag;
 
+    procedure Save(const filename: string);
     procedure SaveToFile(const Name: string);
     function LoadShape(source: TStream): TShape;
     procedure LoadFromFile(const Name: string);
@@ -1131,6 +1136,20 @@ begin
   Points[1].DrawPolygon(scene, canvas, view, False);
 end;
 
+procedure TTriangle.Save(const name: string; parent: TJSONArray);
+var
+  i: integer;
+  child: TJSONObject;
+
+begin
+  for i := 1 to 3 do
+  begin
+    child := TJSONObject.Create;
+    Points[i].Save(name + IntToStr(i + 1), child);
+    parent.Add(child);
+  end;
+end;
+
 procedure TTriangle.SaveToFile(dest: TStream);
 var
   i: integer;
@@ -1280,6 +1299,7 @@ begin
   end;
 end;
 
+{*
 procedure TTriangle.GenerateDirectXForm(D3DRM: IDirect3DRM; MeshBuilder: IDirect3DRMMeshBuilder);
 var
   i: integer;
@@ -1291,6 +1311,7 @@ begin
   for i := 1 to 3 do
     Face.AddVertex(Points[i].x, Points[i].y, Points[i].z);
 end;
+*}
 
 ////////////////////////////////////////////////////////////////////////////////
 // LAYER
@@ -1299,6 +1320,18 @@ constructor TLayer.Create;
 begin
   Visible := True;
   Selectable := True;
+end;
+
+procedure TLayer.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  obj := TJSONObject.Create;
+  obj.AddPair('name', Name);
+  obj.AddPair('visible', TJSONBool.Create(Visible));
+  obj.AddPair('selectable', TJSONBool.Create(Selectable));
+  parent.Add(obj);
 end;
 
 procedure TLayer.SaveToFile(dest: TStream);
@@ -1678,6 +1711,33 @@ end;
 
 procedure TShape.ResetTriangleSelection;
 begin
+end;
+
+procedure TShape.Save(parent: TJSONArray);
+var
+  t: TShapeID;
+  obj: TJSONObject;
+
+begin
+  obj := TJSONObject.Create;
+  t := GetID;
+  obj.AddPair('type', TJSONNumber.Create(ord(t)));
+  obj.AddPair('name', Name);
+  obj.AddPair('flags', TJSONNumber.Create(Byte(Flags)));
+  if assigned(texture) then
+    obj.AddPair('texture', texture.Name)
+  else
+    obj.AddPair('texture', 'unknown');
+  if assigned(layer) then
+    obj.AddPair('layer', layer.Name)
+  else
+    obj.AddPair('layer', 'Foreground');
+
+  Translate.Save('translate', obj);
+  Scale.Save('scale', obj);
+  Rotate.Save('rotate', obj);
+
+  parent.Add(obj);
 end;
 
 procedure TShape.SaveToFile(dest: TStream);
@@ -2072,6 +2132,7 @@ begin
   end;
 end;
 
+{*
 procedure TShape.GenerateDirectXDetails(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame);
 var
   i: integer;
@@ -2096,7 +2157,9 @@ begin
     MeshFrame.AddVisual(MeshBuilder);
   end;
 end;
+*}
 
+{*
 procedure TShape.GenerateDirectXTransforms(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame);
 begin
   if (sfCanGenerate in Features) then
@@ -2113,13 +2176,16 @@ begin
     if sfCanTranslate in Features then MeshFrame.AddTranslation(D3DRMCOMBINE_AFTER, Translate.X, Translate.Y, Translate.Z);
   end;
 end;
+*}
 
+{*
 procedure TShape.GenerateDirectXForm(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame);
 begin
   GenerateDirectXDetails(D3DRM, MeshFrame);
 
   GenerateDirectXTransforms(D3DRM, MeshFrame);
 end;
+*}
 
 procedure TShape.Details;
 begin
@@ -2351,6 +2417,21 @@ begin
   end;
 end;
 
+procedure TCamera.Save(parent: TJSONArray);
+var
+  t: TShapeID;
+  obj: TJSONObject;
+
+begin
+  obj := TJSONObject.Create;
+  t := GetID;
+  obj.AddPair('type', TJSONNumber.Create(ord(t)));
+  obj.AddPair('name', Name);
+  Observer.Save('observer', obj);
+  Observed.Save('observed', obj);
+  parent.Add(obj);
+end;
+
 procedure TCamera.SaveToFile(dest: TStream);
 var
   t: TShapeID;
@@ -2505,6 +2586,26 @@ begin
   Blue := 0;
 end;
 
+procedure TAtmosphereSettings.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  obj := TJSONObject.Create;
+  obj.AddPair('atmospheretype', TJSONNumber.Create(ord(AtmosphereType)));
+  obj.AddPair('distance', TJSONNumber.Create(Distance));
+  obj.AddPair('scattering', TJSONNumber.Create(Scattering));
+  obj.AddPair('eccentricity', TJSONNumber.Create(Eccentricity));
+  obj.AddPair('samples', TJSONNumber.Create(Samples));
+  obj.AddPair('jitter', TJSONNumber.Create(Jitter));
+  obj.AddPair('threshold', TJSONNumber.Create(Threshold));
+  obj.AddPair('level', TJSONNumber.Create(Level));
+  obj.AddPair('red', TJSONNumber.Create(Red));
+  obj.AddPair('green', TJSONNumber.Create(Green));
+  obj.AddPair('blue', TJSONNumber.Create(Blue));
+  parent.Add(obj);
+end;
+
 procedure TAtmosphereSettings.SaveToFile(stream: TStream);
 begin
   stream.WriteBuffer(AtmosphereType, sizeof(AtmosphereType));
@@ -2552,6 +2653,27 @@ begin
   Octaves := 0;
   Offset := 0;
   Alt := 0;
+end;
+
+procedure TFog.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  obj := TJSONObject.Create;
+  obj.AddPair('fogtype', TJSONNumber.Create(ord(FogType)));
+  obj.AddPair('distance', TJSONNumber.Create(Distance));
+  obj.AddPair('red', TJSONNumber.Create(Red));
+  obj.AddPair('green', TJSONNumber.Create(Green));
+  obj.AddPair('blue', TJSONNumber.Create(Blue));
+  obj.AddPair('turbulence', TJSONNumber.Create(Turbulence));
+  obj.AddPair('turbulencedepth', TJSONNumber.Create(TurbulenceDepth));
+  obj.AddPair('omega', TJSONNumber.Create(Omega));
+  obj.AddPair('lambda', TJSONNumber.Create(Lambda));
+  obj.AddPair('octaves', TJSONNumber.Create(Octaves));
+  obj.AddPair('offset', TJSONNumber.Create(Offset));
+  obj.AddPair('alt', TJSONNumber.Create(Alt));
+  parent.Add(obj);
 end;
 
 procedure TFog.SaveToFile(stream: TStream);
@@ -2677,28 +2799,41 @@ begin
   end;
 end;
 
-procedure TScriptFile.Save(const name: string);
+procedure TScriptFile.Save(parent: TJSONArray);
 var
   i, n: integer;
-  stream: TFileStream;
+  obj: TJSONObject;
+  propsArray: TJSONArray;
   prop: TScriptProperty;
 
 begin
-  stream := TFileStream.Create(name, fmCreate);
-  if stream <> nil then
+  obj := TJSONObject.Create;
+  obj.AddPair('description', FDescription);
+  n := FProperties.Count;
+  propsArray := TJSONArray.Create;
+  for i := 0 to n - 1 do
   begin
-    SaveStringToStream(FDescription, stream);
-    n := FProperties.Count;
-    stream.Write(n, sizeof(integer));
-
-    for i := 0 to n - 1 do
-    begin
-      prop := FProperties[i];
-      prop.SaveToStream(stream);
-    end;
-
-    stream.Free;
+    prop := FProperties[i];
+    prop.Save(propsArray);
   end;
+  obj.AddPair('properties', propsArray);
+  parent.Add(obj);
+end;
+
+procedure TScriptFile.Save(const name: string);
+var
+  root: TJSONObject;
+  props: TJSONArray;
+  text: string;
+
+begin
+  root := TJSONObject.Create;
+  props := TJSONArray.Create;
+  Save(props);
+  root.AddPair('properties', props);
+  text := root.ToJSON;
+  root.Free;
+  TFile.WriteAllText(name, text);
 end;
 
 procedure TScriptFile.Edit;
@@ -3521,6 +3656,44 @@ begin
   Mode := mdCreate;
   CreateWhat := TScripted;
   CreateWhatScripted := AType;
+end;
+
+procedure TSceneData.Save(const filename: string);
+var
+  i, n: integer;
+  text: string;
+  root: TJSONObject;
+  shapesArray, layersArray: TJSONArray;
+  layer: TLayer;
+  shape: TShape;
+
+begin
+  Screen.Cursor := crHourglass;
+  try
+    root := TJSONObject.Create;
+    root.AddPair('version', TJSONNumber.Create(ModelVersion));
+    layersArray := TJSONArray.Create;
+    n := Layers.Count;
+    for i := 0 to n - 1 do
+    begin
+      layer := Layers[i] as TLayer;
+      layer.Save(layersArray);
+    end;
+    root.AddPair('layers', layersArray);
+    shapesArray := TJSONArray.Create;
+    n := Shapes.Count;
+    for i := 0 to n - 1 do
+    begin
+      Shape := Shapes[i] as TShape;
+      Shape.Save(shapesArray);
+    end;
+    root.AddPair('shapes', shapesArray);
+    text := root.ToJSON;
+    root.Free;
+    TFile.WriteAllText(filename, text);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 procedure TSceneData.SaveToFile(const Name: string);

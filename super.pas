@@ -21,8 +21,10 @@ unit super;
 interface
 
 uses
-    Windows, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-    StdCtrls, Dialogs, Buttons, Messages, Vector, Scene, Cube;
+  System.JSON,
+    Winapi.Windows, System.SysUtils, System.Classes, VCL.Graphics, VCL.Forms,
+    VCL.Controls, VCL.Menus,
+    VCL.StdCtrls, VCL.Dialogs, VCL.Buttons, Winapi.Messages, Vector, Scene, Cube;
 
 type
   TSuperEllipsoid = class(TCube)
@@ -33,6 +35,7 @@ type
       function GetID: TShapeID; override;
       procedure Generate(var dest: TextFile); override;
       procedure Details; override;
+      procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
     end;
@@ -81,6 +84,18 @@ begin
   end;
 
   dlg.Free;
+end;
+
+procedure TSuperEllipsoid.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  obj.AddPair('r', TJSONNumber.Create(R));
+  obj.AddPair('n', TJSONNumber.Create(N));
+  parent.Add(obj);
 end;
 
 procedure TSuperEllipsoid.SaveToFile(dest: TStream);

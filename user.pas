@@ -14,14 +14,15 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit user;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, Forms, Scene;
+  System.JSON,
+  Winapi.Windows, System.SysUtils, System.Classes, VCL.Forms, Scene;
 
 type
   TUserLike = (utCube, utSphere);
@@ -33,6 +34,7 @@ type
 
     constructor Create; override;
     function GetID: TShapeid; override;
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
@@ -56,6 +58,22 @@ end;
 function TUserShape.GetID: TShapeID;
 begin
   result := siUser;
+end;
+
+procedure TUserShape.Save(parent: TJSONArray);
+var
+  i, n: integer;
+  obj: TJSONObject;
+  strs: TJSONArray;
+
+begin
+  inherited;
+  n := User.Count;
+  strs := TJSONArray.Create;
+  for i := 0 to n - 1 do
+    strs.Add(User.Strings[i]);
+  obj.AddPair('text', strs);
+  parent.Add(obj);
 end;
 
 procedure TUserShape.SaveToFile(dest: TStream);

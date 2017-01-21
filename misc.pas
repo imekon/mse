@@ -21,7 +21,8 @@ unit misc;
 interface
 
 uses
-  Windows, Classes, Graphics, JPEG, ShellAPI, Registry;
+  WinApi.Windows, System.Classes, VCL.Graphics, VCL.Imaging.JPEG,
+  Winapi.ShellAPI, System.Win.Registry;
 
   function WinExecAndWait32(const FileName: String; Visibility : integer): cardinal;
   procedure WinExec32(const FileName: String; Visibility : integer);

@@ -14,13 +14,14 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit julia;
 
 interface
 
 uses
+  System.JSON,
     Windows, SysUtils, Classes, Graphics, Forms, Controls, Menus,
     StdCtrls, Dialogs, Buttons, Messages, Vector, Scene;
 
@@ -44,6 +45,7 @@ type
       constructor Create; override;
       function GetID: TShapeID; override;
       procedure Generate(var dest: TextFile); override;
+      procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
       procedure Details; override;
@@ -123,6 +125,31 @@ begin
   inherited Generate(dest);
   WriteLn(dest, '}');
   WriteLn(dest);
+end;
+
+procedure TJuliaFractal.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  obj.AddPair('x', TJSONNumber.Create(x));
+  obj.AddPair('y', TJSONNumber.Create(y));
+  obj.AddPair('z', TJSONNumber.Create(z));
+  obj.AddPair('d', TJSONNumber.Create(d));
+  obj.AddPair('juliatype', TJSONNumber.Create(ord(JuliaType)));
+  obj.AddPair('juliafunction', TJSONNumber.Create(ord(JuliaFunction)));
+  obj.AddPair('pwrx', TJSONNumber.Create(PwrX));
+  obj.AddPair('pwry', TJSONNumber.Create(PwrY));
+  obj.AddPair('maxiteration', TJSONNumber.Create(MaxIteration));
+  obj.AddPair('precision', TJSONNumber.Create(Precision));
+  obj.AddPair('slicex', TJSONNumber.Create(SliceX));
+  obj.AddPair('slicey', TJSONNumber.Create(SliceY));
+  obj.AddPair('slicez', TJSONNumber.Create(SliceZ));
+  obj.AddPair('sliced', TJSONNumber.Create(SliceD));
+  obj.AddPair('slicedistance', TJSONNumber.Create(SliceDistance));
+  parent.Add(obj);
 end;
 
 procedure TJuliaFractal.SaveToFile(dest: TStream);

@@ -14,15 +14,17 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit htfld;
 
 interface
 
 uses
-    WinTypes, WinProcs, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-    StdCtrls, Dialogs, Buttons, Messages, Vector, Scene;
+  System.JSON,
+    Winapi.Windows, System.SysUtils, System.Classes, VCL.Graphics, VCL.Forms,
+    VCL.Controls, VCL.Menus,
+    VCL.StdCtrls, VCL.Dialogs, VCL.Buttons, Winapi.Messages, Vector, Scene;
 
 type
   THeightFieldFileType = (hfGIF, hfPGM, hfPNG, hfPOT, hfPPM, hfBMP, hfTGA);
@@ -37,6 +39,7 @@ type
       constructor Create; override;
       function GetID: TShapeID; override;
       procedure Generate(var dest: TextFile); override;
+      procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
       procedure Details; override;
@@ -56,6 +59,21 @@ begin
   Hierarchy := False;
   Smooth := False;
   WaterLevel := 0;
+end;
+
+procedure THeightField.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  obj.AddPair('filename', Filename);
+  obj.AddPair('filetype', TJSONNumber.Create(ord(FileType)));
+  obj.AddPair('hierarchy', TJSONBool.Create(Hierarchy));
+  obj.AddPair('smooth', TJSONBool.Create(Smooth));
+  obj.AddPair('waterlevel', TJSONNumber.Create(WaterLevel));
+  parent.Add(obj);
 end;
 
 procedure THeightField.SaveToFile(dest: TStream);

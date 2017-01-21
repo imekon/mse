@@ -22,9 +22,10 @@ interface
 
 uses
   System.UITypes, System.Contnrs, System.IOUtils, System.JSON,
-  Windows, Messages, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-  Dialogs, StdCtrls, Buttons, ExtCtrls, ComCtrls, Registry, Texture, Halo, Tabs,
-  Scene, ToolWin, ImgList, ActnList, System.ImageList, System.Actions;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, VCL.Graphics,
+  VCL.Forms, VCL.Controls, VCL.Menus,
+  VCL.Dialogs, VCL.StdCtrls, VCL.Buttons, VCL.ExtCtrls, VCL.ComCtrls, System.Win.Registry, Texture, Halo, VCL.Tabs,
+  Scene, VCL.ToolWin, VCL.ImgList, VCL.ActnList, System.ImageList, System.Actions;
 
 {$INCLUDE DirectX.inc}
 
@@ -633,7 +634,7 @@ begin
   if SaveDialog.Execute then
   begin
     Filename := SaveDialog.Filename;
-    SceneData.SaveToFile(Filename);
+    SceneData.Save(Filename);
     SetCaption(Filename);
     //MRUFileList.AddItem(Filename);
   end;

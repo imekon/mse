@@ -21,7 +21,7 @@ unit Bicubic;
 interface
 
 uses
-  System.Contnrs,
+  System.Contnrs, System.JSON,
   WinTypes, WinProcs, SysUtils, Classes, Graphics, Forms, Controls, Menus,
   StdCtrls, Dialogs, Buttons, Messages, Vector, Scene;
 
@@ -40,7 +40,8 @@ type
     Controls: array [0..3, 0..3] of TControlPoint;
 
     constructor Create;
-    destructor Destroy; override;
+    destructor Destroy;
+    procedure Save(parent: TJSONArray);
     procedure SaveToFile(dest: TStream);
     procedure LoadFromFile(source: TStream);
     procedure Generate(var dest: TextFile; PatchType: integer;
@@ -157,6 +158,23 @@ begin
     end;
 end;
 
+procedure TBicubicPatch.Save(parent: TJSONArray);
+var
+  x, y: integer;
+  obj: TJSONObject;
+  v: TControlPoint;
+
+begin
+  obj := TJSONObject.Create;
+  for y := 0 to 3 do
+    for x := 0 to 3 do
+    begin
+      v := Controls[x, y];
+      v.Save('control', obj);
+    end;
+  parent.Add(obj);
+end;
+
 procedure TBicubicPatch.SaveToFile(dest: TStream);
 var
   x, y: integer;
@@ -164,7 +182,7 @@ var
 
 begin
   for y := 0 to 3 do
-    for x:= 0 to 3 do
+    for x := 0 to 3 do
     begin
       v := Controls[x, y];
       v.SaveToFile(dest);

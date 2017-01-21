@@ -14,16 +14,19 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit Light;
 
 interface
 
 uses
-    WinTypes, WinProcs, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-    StdCtrls, Dialogs, Buttons, Messages, Misc, Vector, Texture, Scene,
-    LightEdit, SpotEdit, AreaEdit, DirectX;
+  System.JSON,
+    Winapi.Windows, System.SysUtils, System.Classes, VCL.Graphics, VCL.Forms,
+    VCL.Controls, VCL.Menus,
+    VCL.StdCtrls, VCL.Dialogs, VCL.Buttons, Winapi.Messages, Misc, Vector,
+    Texture, Scene,
+    LightEdit, SpotEdit, AreaEdit;
 
 type
   TLooksLike = (llLight, llSphere, llCube, llCone, llCylinder);
@@ -45,8 +48,8 @@ type
       procedure GenerateVRML(var dest: TextFile); override;
       procedure GenerateCoolRay(var dest: TextFile); override;
       procedure GenerateLight(var dest: TextFile); virtual;
-      procedure GenerateDirectXForm(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame); override;
       function CheckTexture: boolean; override;
+      procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
       procedure Details; override;
@@ -67,7 +70,6 @@ type
       function GetObserved: TVector; override;
       procedure SetObserved(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean); override;
       procedure GenerateLight(var dest: TextFile); override;
-      procedure GenerateDirectXForm(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
       procedure Details; override;
@@ -195,6 +197,7 @@ procedure TLight.GenerateLight(var dest: TextFile);
 begin
 end;
 
+{*
 procedure TLight.GenerateDirectXForm(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame);
 var
   Light: IDirect3DRMLight;
@@ -206,6 +209,7 @@ begin
 
   MeshFrame.AddTranslation(D3DRMCOMBINE_AFTER, Translate.X, Translate.Y, Translate.Z);
 end;
+*}
 
 procedure TLight.GenerateCoolRay(var dest: TextFile);
 begin
@@ -213,6 +217,24 @@ begin
   WriteLn(dest, '    {');
   GenerateCoolRayDetails(dest);
   WriteLn(dest, '    }');
+end;
+
+procedure TLight.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  obj.AddPair('red', TJSONNumber.Create(Red));
+  obj.AddPair('green', TJSONNumber.Create(Green));
+  obj.AddPair('blue', TJSONNumber.Create(Blue));
+  obj.AddPair('fadedistance', TJSONNumber.Create(FadeDistance));
+  obj.AddPair('fadepower', TJSONNumber.Create(FadePower));
+  obj.AddPair('atmosphericattenuation', TJSONBool.Create(AtmosphericAttenuation));
+  obj.AddPair('lookslike', TJSONNumber.Create(ord(LooksLike)));
+  obj.AddPair('shadowless', TJSONBool.Create(Shadowless));
+  parent.Add(obj);
 end;
 
 procedure TLight.SaveToFile(dest: TStream);
@@ -378,6 +400,7 @@ begin
   WriteLn(dest, Format('    tightness %6.4f', [Tightness]));
 end;
 
+{*
 procedure TSpotLight.GenerateDirectXForm(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame);
 var
   Light: IDirect3DRMLight;
@@ -389,6 +412,7 @@ begin
 
   MeshFrame.AddTranslation(D3DRMCOMBINE_AFTER, Translate.X, Translate.Y, Translate.Z);
 end;
+*}
 
 procedure TSpotLight.SaveToFile(dest: TStream);
 begin

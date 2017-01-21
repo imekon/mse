@@ -14,16 +14,17 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit disc;
 
 interface
 
 uses
-    System.UITypes,
-    WinTypes, WinProcs, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-    StdCtrls, Dialogs, Buttons, Messages, Vector, Scene;
+    System.UITypes, System.JSON,
+    Winapi.Windows, System.SysUtils, System.Classes, VCL.Graphics, VCL.Forms,
+    VCL.Controls, VCL.Menus,
+    VCL.StdCtrls, VCL.Dialogs, VCL.Buttons, Winapi.Messages, Vector, Scene;
 
 type
   TDisc = class(TShape)
@@ -35,6 +36,7 @@ type
     procedure Generate(var dest: TextFile); override;
     procedure Details; override;
     procedure LoadFromFile(source: TStream); override;
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure Build;
   end;
@@ -111,6 +113,18 @@ begin
   source.ReadBuffer(Hole, sizeof(Hole));
 
   Build;
+end;
+
+procedure TDisc.Save(parent: TJSONArray);
+var
+  child: TJSONObject;
+
+begin
+  inherited;
+  child := TJSONObject.Create;
+  child.AddPair('radius', TJSONNumber.Create(Radius));
+  child.AddPair('hole', TJSONNumber.Create(Hole));
+  parent.Add(child);
 end;
 
 procedure TDisc.SaveToFile(dest: TStream);

@@ -14,14 +14,16 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit hexagon;
 
 interface
 
 uses
-  Windows, Classes, SysUtils, Graphics, Forms, Vector, Texture;
+  System.JSON,
+  Winapi.Windows, System.Classes, System.SysUtils, VCL.Graphics, VCL.Forms,
+  Vector, Texture;
 
 type
   THexagonTexture = class(TTexture)
@@ -32,6 +34,7 @@ type
 
     constructor Create; override;
     function GetID: TTextureID; override;
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
@@ -60,6 +63,26 @@ end;
 function THexagonTexture.GetID: TTextureID;
 begin
   result := tiHexagon;
+end;
+
+procedure THexagonTexture.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  obj.AddPair('red2', TJSONNumber.Create(Red2));
+  obj.AddPair('green2', TJSONNumber.Create(Green2));
+  obj.AddPair('blue2', TJSONNumber.Create(Blue2));
+  obj.AddPair('filter2', TJSONNumber.Create(Filter2));
+  obj.AddPair('transmit2', TJSONNumber.Create(Transmit2));
+  obj.AddPair('red3', TJSONNumber.Create(Red3));
+  obj.AddPair('green3', TJSONNumber.Create(Green3));
+  obj.AddPair('blue3', TJSONNumber.Create(Blue3));
+  obj.AddPair('filter3', TJSONNumber.Create(Filter3));
+  obj.AddPair('transmit3', TJSONNumber.Create(Transmit3));
+  parent.Add(obj);
 end;
 
 procedure THexagonTexture.SaveToFile(dest: TStream);

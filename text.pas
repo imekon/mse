@@ -21,8 +21,10 @@ unit text;
 interface
 
 uses
-    WinTypes, WinProcs, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-    StdCtrls, Dialogs, Buttons, Messages, Vector, Scene;
+  System.JSON,
+    Winapi.Windows, System.SysUtils, System.Classes, VCL.Graphics, VCL.Forms,
+    VCL.Controls, VCL.Menus,
+    VCL.StdCtrls, VCL.Dialogs, VCL.Buttons, Winapi.Messages, Vector, Scene;
 
 type
   TText = class(TShape)
@@ -35,6 +37,7 @@ type
       constructor Create; override;
       destructor Destroy; override;
       function GetID: TShapeID; override;
+      procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
       procedure Generate(var dest: TextFile); override;
@@ -67,6 +70,19 @@ end;
 function TText.GetID: TShapeID;
 begin
   result := siText;
+end;
+
+procedure TText.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  obj.AddPair('font', Font);
+  obj.AddPair('text', Text);
+  obj.AddPair('thickness', TJSONNumber.Create(Thickness));
+  parent.Add(obj);
 end;
 
 procedure TText.SaveToFile(dest: TStream);

@@ -14,15 +14,17 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit scripted;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-  StdCtrls, Dialogs, Buttons, Messages, Vector, Scene;
+  System.JSON,
+  Winapi.Windows, System.SysUtils, System.Classes, VCL.Graphics, VCL.Forms,
+  VCL.Controls, VCL.Menus,
+  VCL.StdCtrls, VCL.Dialogs, VCL.Buttons, Winapi.Messages, Vector, Scene;
 
 type
   // Properties
@@ -35,6 +37,7 @@ type
     constructor Create; virtual;
     function GetID: TPropertyID; virtual; abstract;
     procedure LoadFromStream(stream: TStream); virtual;
+    procedure Save(parent: TJSONArray);
     procedure SaveToStream(stream: TStream); virtual;
     procedure LoadValueFromStream(stream: TStream); virtual;
     procedure SaveValueToStream(stream: TStream); virtual;
@@ -112,6 +115,19 @@ end;
 procedure TScriptProperty.LoadFromStream(stream: TStream);
 begin
   LoadStringFromStream(name, stream);
+end;
+
+procedure TScriptProperty.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+  id: TPropertyID;
+
+begin
+  obj := TJSONObject.Create;
+  id := GetID;
+  obj.AddPair('id', TJSONNumber.Create(ord(id)));
+  obj.AddPair('name', Name);
+  parent.Add(obj);
 end;
 
 procedure TScriptProperty.SaveToStream(stream: TStream);

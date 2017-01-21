@@ -14,14 +14,14 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit env;
 
 interface
 
 uses
-  Forms, Scene;
+  VCL.Forms, Scene;
 
 type
   TEnvironment = class(TShape)

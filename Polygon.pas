@@ -21,7 +21,7 @@ unit Polygon;
 interface
 
 uses
-  System.Contnrs,
+  System.Contnrs, System.JSON,
     WinTypes, WinProcs, SysUtils, Classes, Graphics, Forms, Controls, Menus,
     StdCtrls, Dialogs, Buttons, Messages, Scene;
 
@@ -53,6 +53,7 @@ type
 
       constructor Create; override;
       function GetID: TShapeid; override;
+      procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
       procedure Generate(var dest: TextFile); override;
@@ -124,6 +125,28 @@ end;
 function TPolygon.GetID: TShapeID;
 begin
   result := siPolygon;
+end;
+
+procedure TPolygon.Save(parent: TJSONArray);
+var
+  i, n: integer;
+  triangle: TTriangle;
+  trianglesArray: TJSONArray;
+  obj: TJSONObject;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  trianglesArray := TJSONArray.Create;
+  n := Triangles.Count;
+  for i := 0 to n - 1 do
+  begin
+    triangle := Triangles[i] as TTriangle;
+    triangle.Save('triangle', trianglesArray);
+  end;
+  obj.AddPair('smoothshaded', TJSONBool.Create(SmoothShaded));
+  obj.AddPair('triangles', trianglesArray);
+  parent.Add(obj);
 end;
 
 procedure TPolygon.SaveToFile(dest: TStream);

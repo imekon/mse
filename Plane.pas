@@ -14,15 +14,16 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit Plane;
 
 interface
 
 uses
-    WinTypes, WinProcs, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-    StdCtrls, Dialogs, Buttons, Messages, Vector, Scene, DirectX;
+    Winapi.Windows, System.SysUtils, System.Classes, VCL.Graphics, VCL.Forms,
+    VCL.Controls, VCL.Menus,
+    VCL.StdCtrls, VCL.Dialogs, VCL.Buttons, Winapi.Messages, Vector, Scene;
 
 type
   TPlane = class(TShape)
@@ -30,7 +31,6 @@ type
     constructor Create; override;
     function GetID: TShapeID; override;
     procedure Generate(var dest: TextFile); override;
-    procedure GenerateDirectXForm(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame); override;
   end;
 
 implementation
@@ -61,6 +61,7 @@ begin
   WriteLn(dest);
 end;
 
+{*
 procedure TPlane.GenerateDirectXForm(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame);
 var
   MeshBuilder: IDirect3DRMMeshBuilder;
@@ -90,5 +91,6 @@ begin
 
   MeshFrame.AddVisual(MeshBuilder);
 end;
+*}
 
 end.

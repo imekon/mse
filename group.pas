@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  The Group shape
 //
-//  The group shape is a collection shape, containing other shaps.
+//  The group shape is a collection shape, containing other shapes.
 //
 //  The gallery shape points to a notional group shape in the gallery list
 //  and copies the contents to itself (I know, not very efficient, but I need
@@ -30,10 +30,12 @@ unit group;
 interface
 
 uses
-  System.Types,
-  Windows, SysUtils, Classes, Graphics, Forms, Controls, Menus,
-  StdCtrls, ComCtrls, Dialogs, Buttons, Messages, Vector, Texture, Scene,
-  DirectX, Contnrs;
+  System.Types, System.JSON,
+  Winapi.Windows, System.SysUtils, System.Classes, VCL.Graphics, VCL.Forms,
+  VCL.Controls, VCL.Menus,
+  VCL.StdCtrls, VCL.ComCtrls, VCL.Dialogs, VCL.Buttons, Winapi.Messages,
+  Vector, Texture, Scene,
+  System.Contnrs;
 
 type
   TGroupShape = class(TShape)
@@ -47,9 +49,9 @@ type
     procedure Make(scene: TSceneData; theTriangles: TList); override;
     procedure Draw(Scene: TSceneData; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); override;
     procedure Generate(var dest: TextFile); override;
-    procedure GenerateDirectXDetails(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame); override;
     procedure AddShape(shape: TShape);
     procedure RemoveShape(shape: TShape);
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
     procedure SetTexture(ATexture: TTexture); override;
@@ -131,6 +133,7 @@ begin
   WriteLn(dest);
 end;
 
+{*
 procedure TGroupShape.GenerateDirectXDetails(D3DRM: IDirect3DRM; MeshFrame: IDirect3DRMFrame);
 var
   i: integer;
@@ -152,6 +155,7 @@ begin
     end;
   end;
 end;
+*}
 
 procedure TGroupShape.Make(scene: TSceneData; theTriangles: TList);
 var
@@ -197,6 +201,27 @@ begin
   Shapes.Extract(shape);
 
   Make(MainForm.SceneData, Triangles);
+end;
+
+procedure TGroupShape.Save(parent: TJSONArray);
+var
+  i, n: integer;
+  shape: TShape;
+  obj: TJSONObject;
+  children: TJSONArray;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  children := TJSONArray.Create;
+  n := Shapes.Count;
+  for i := 0 to n - 1 do
+  begin
+    shape := Shapes[i] as TShape;
+    shape.Save(children);
+  end;
+  obj.AddPair('shapes', children);
+  parent.Add(obj);
 end;
 
 procedure TGroupShape.SaveToFile(dest: TStream);

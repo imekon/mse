@@ -21,6 +21,7 @@ unit Solid;
 interface
 
 uses
+  System.JSON,
     WinTypes, WinProcs, SysUtils, Classes, Graphics, Forms, Controls, Menus,
     StdCtrls, Dialogs, Buttons, Messages, Engine, Vector, Scene;
 
@@ -44,6 +45,7 @@ type
     destructor Destroy; override;
     function GetID: TShapeID; override;
     function CanBlob: boolean;
+    procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
@@ -146,6 +148,34 @@ begin
     if abs(p1.x - p2.x) < 0.001 then
       result := True;
   end
+end;
+
+procedure TSolid.Save(parent: TJSONArray);
+var
+  i, n: integer;
+  point: TSolidPoint;
+  obj, pointObj: TJSONObject;
+  pointsArray: TJSONArray;
+
+begin
+  inherited;
+  obj := TJSONObject.Create;
+  obj.AddPair('open', TJSONBool.Create(Open));
+  obj.AddPair('usesor', TJSONBool.Create(UseSOR));
+  obj.AddPair('sturm', TJSONBool.Create(Sturm));
+  obj.AddPair('strength', TJSONNumber.Create(Strength));
+  n := Points.Count;
+  pointsArray := TJSONArray.Create;
+  for i := 0 to n - 1 do
+  begin
+    point := Points[i];
+    pointObj := TJSONObject.Create;
+    pointObj.AddPair('x', TJSONNumber.Create(point.x));
+    pointObj.AddPair('y', TJSONNumber.Create(point.y));
+    pointsArray.Add(pointObj);
+  end;
+  obj.AddPair('points', pointsArray);
+  parent.Add(obj);
 end;
 
 procedure TSolid.SaveToFile(dest: TStream);
