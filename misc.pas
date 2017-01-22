@@ -38,6 +38,7 @@ uses
   function GotoURL(const url: string): boolean;
   function GetModelDirectory: string;
   function GetTexturesDirectory: string;
+  procedure Split(Delimiter: Char; Str: string; ListOfStrings: TStrings);
 
 implementation
 
@@ -232,6 +233,14 @@ end;
 function GetTexturesDirectory: string;
 begin
   result := GetModelDirectory + '\textures';
+end;
+
+procedure Split(Delimiter: Char; Str: string; ListOfStrings: TStrings);
+begin
+   ListOfStrings.Clear;
+   ListOfStrings.Delimiter       := Delimiter;
+   ListOfStrings.StrictDelimiter := True; // Requires D2006 or newer.
+   ListOfStrings.DelimitedText   := Str;
 end;
 
 end.

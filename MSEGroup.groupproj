@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{88229004-BDE1-4F5B-8A83-540941E20761}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="mse.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ConvertColors\convertcolors.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="mse">
+        <MSBuild Projects="mse.dproj"/>
+    </Target>
+    <Target Name="mse:Clean">
+        <MSBuild Projects="mse.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="mse:Make">
+        <MSBuild Projects="mse.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="convertcolors">
+        <MSBuild Projects="ConvertColors\convertcolors.dproj"/>
+    </Target>
+    <Target Name="convertcolors:Clean">
+        <MSBuild Projects="ConvertColors\convertcolors.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="convertcolors:Make">
+        <MSBuild Projects="ConvertColors\convertcolors.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="mse;convertcolors"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="mse:Clean;convertcolors:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="mse:Make;convertcolors:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

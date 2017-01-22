@@ -1376,6 +1376,9 @@ object MainForm: TMainForm
       object SaveTexturesItem: TMenuItem
         Action = SaveTextureAction
       end
+      object ImportTexture1: TMenuItem
+        Action = ImportTextureAction
+      end
       object N9: TMenuItem
         Caption = '-'
       end
@@ -1935,7 +1938,7 @@ object MainForm: TMainForm
   object SaveDialog: TSaveDialog
     Filter = 'All Files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly]
-    Left = 463
+    Left = 479
     Top = 78
   end
   object LightPopup: TPopupMenu
@@ -1976,7 +1979,7 @@ object MainForm: TMainForm
     Top = 139
   end
   object PrinterSetupDialog: TPrinterSetupDialog
-    Left = 467
+    Left = 483
     Top = 139
   end
   object ActionList: TActionList
@@ -2038,6 +2041,11 @@ object MainForm: TMainForm
       Hint = 'Export|Export to other scene types'
       ImageIndex = 4
       OnExecute = ExportItemClick
+    end
+    object ImportTextureAction: TAction
+      Category = 'File'
+      Caption = 'Import Textures...'
+      OnExecute = OnImportTexture
     end
     object RenderPOVrayAction: TAction
       Category = 'File'
@@ -2192,7 +2200,7 @@ object MainForm: TMainForm
     Left = 195
     Top = 127
     Bitmap = {
-      494C010114001800180010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101140018001C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000006000000001002000000000000060
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

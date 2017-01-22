@@ -1,16 +1,36 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{8D042F64-AB0E-4B34-8CC0-251FF52B7ABB}</ProjectGuid>
-        <MainSource>mse.dpr</MainSource>
+        <ProjectGuid>{7558E743-32EA-4C1B-8221-DCF1EAE5BB73}</ProjectGuid>
+        <ProjectVersion>18.1</ProjectVersion>
+        <FrameworkType>None</FrameworkType>
+        <MainSource>convertcolors.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <TargetedPlatforms>3</TargetedPlatforms>
-        <AppType>Application</AppType>
-        <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>18.2</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <TargetedPlatforms>3</TargetedPlatforms>
+        <AppType>Console</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Base)'=='true') or '$(Base_Android)'!=''">
+        <Base_Android>true</Base_Android>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice32' and '$(Base)'=='true') or '$(Base_iOSDevice32)'!=''">
+        <Base_iOSDevice32>true</Base_iOSDevice32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Base)'=='true') or '$(Base_iOSDevice64)'!=''">
+        <Base_iOSDevice64>true</Base_iOSDevice64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSSimulator' and '$(Base)'=='true') or '$(Base_iOSSimulator)'!=''">
+        <Base_iOSSimulator>true</Base_iOSSimulator>
+        <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
@@ -23,7 +43,7 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
         <Cfg_1>true</Cfg_1>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
@@ -34,437 +54,122 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
-        <Cfg_1_Win64>true</Cfg_1_Win64>
-        <CfgParent>Cfg_1</CfgParent>
-        <Cfg_1>true</Cfg_1>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSDevice64)'!=''">
-        <Cfg_2_iOSDevice64>true</Cfg_2_iOSDevice64>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
-        <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
-        <Cfg_2_Win64>true</Cfg_2_Win64>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <VerInfo_MinorVer>14</VerInfo_MinorVer>
-        <VerInfo_MajorVer>0</VerInfo_MajorVer>
-        <DCC_S>false</DCC_S>
-        <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
-        <SanitizedProjectName>mse</SanitizedProjectName>
+        <SanitizedProjectName>convertcolors</SanitizedProjectName>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
-        <VerInfo_Locale>2057</VerInfo_Locale>
-        <DCC_DebugInformation>1</DCC_DebugInformation>
-        <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
-        <VerInfo_PreRelease>true</VerInfo_PreRelease>
-        <DCC_ImageBase>00400000</DCC_ImageBase>
-        <DCC_K>false</DCC_K>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
         <DCC_F>false</DCC_F>
-        <DCC_UsePackage>VCLX30;VCL30;VCLDB30;VCLDBX30;VCLSMP30;QRPT30;TEEUI30;TEEDB30;TEE30;IBEVNT30;$(DCC_UsePackage)</DCC_UsePackage>
-        <DCC_WriteableConstants>true</DCC_WriteableConstants>
-        <DCC_RangeChecking>true</DCC_RangeChecking>
-        <VerInfo_Build>37</VerInfo_Build>
-        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;FireDAC.VCLUI;IW.Browser;FMXTee;DUnitX.CommandLine;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_N>true</DCC_N>
-        <VerInfo_Keys>CompanyName=Pete Goodwin;FileDescription=MSE;FileVersion=0.14.0.37;InternalName=MSE;LegalCopyright=Copyright © 1996, 2001 Pete Goodwin;LegalTrademarks=;OriginalFilename=MSE.EXE;ProductName=Model Scene Editor;ProductVersion=1.0.0.0;Comments=Model Scene Editor is distributed under the terms of the GNU General Public License (GPL).</VerInfo_Keys>
-        <DCC_UnitSearchPath>$(DELPHI)\Extras;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_K>false</DCC_K>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Android)'!=''">
+        <Android_SplashImage960>$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png</Android_SplashImage960>
+        <Android_SplashImage640>$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png</Android_SplashImage640>
+        <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
+        <Android_SplashImage426>$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png</Android_SplashImage426>
+        <Android_LauncherIcon72>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png</Android_LauncherIcon72>
+        <Android_LauncherIcon48>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png</Android_LauncherIcon48>
+        <Android_SplashImage470>$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png</Android_SplashImage470>
+        <Android_LauncherIcon96>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png</Android_LauncherIcon96>
+        <Android_LauncherIcon144>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png</Android_LauncherIcon144>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSDevice32)'!=''">
+        <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;IndyIPServer;IndySystem;tethering;fmxFireDAC;FireDAC;bindcompfmx;FireDACSqliteDriver;soaprtl;DbxCommonDriver;FireDACIBDriver;fmx;xmlrtl;soapmidas;rtl;DbxClientDriver;CustomIPTransport;dbexpress;IndyCore;bindcomp;dsnap;FireDACCommon;IndyIPClient;RESTBackendComponents;soapserver;dbxcds;bindengine;CloudService;dsnapxml;dbrtl;IndyProtocols;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
+        <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;IndyIPServer;IndySystem;tethering;fmxFireDAC;FireDAC;bindcompfmx;FireDACSqliteDriver;soaprtl;DbxCommonDriver;FireDACIBDriver;fmx;xmlrtl;soapmidas;rtl;DbxClientDriver;CustomIPTransport;dbexpress;IndyCore;bindcomp;dsnap;FireDACCommon;IndyIPClient;RESTBackendComponents;soapserver;dbxcds;bindengine;CloudService;dsnapxml;dbrtl;IndyProtocols;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSSimulator)'!=''">
+        <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;IndyIPServer;IndySystem;tethering;fmxFireDAC;FireDAC;bindcompfmx;FireDACSqliteDriver;soaprtl;DbxCommonDriver;FireDACIBDriver;fmx;xmlrtl;soapmidas;rtl;DbxClientDriver;CustomIPTransport;dbexpress;IndyCore;bindcomp;dsnap;FireDACCommon;IndyIPClient;RESTBackendComponents;soapserver;dbxcds;bindengine;CloudService;dsnapxml;dbrtl;IndyProtocols;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <Icon_MainIcon>mse_Icon.ico</Icon_MainIcon>
-        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(ModuleName)</VerInfo_Keys>
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;svnui;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;FireDAC;vcltouch;vcldb;bindcompfmx;svn;FireDACSqliteDriver;FireDACPgDriver;inetdb;soaprtl;DbxCommonDriver;FireDACIBDriver;fmx;fmxdae;xmlrtl;soapmidas;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;FireDACCommon;IndyIPClient;bindcompvcl;RESTBackendComponents;VCLRESTComponents;soapserver;dbxcds;VclSmp;adortl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <Icon_MainIcon>mse_Icon.ico</Icon_MainIcon>
-        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;FireDAC;vcltouch;vcldb;bindcompfmx;FireDACSqliteDriver;FireDACPgDriver;inetdb;soaprtl;DbxCommonDriver;FireDACIBDriver;fmx;fmxdae;xmlrtl;soapmidas;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;FireDACCommon;IndyIPClient;bindcompvcl;RESTBackendComponents;VCLRESTComponents;soapserver;dbxcds;VclSmp;adortl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
-        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-        <DCC_DebugInformation>0</DCC_DebugInformation>
-        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
-        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <VerInfo_MajorVer>1</VerInfo_MajorVer>
-        <VerInfo_MinorVer>0</VerInfo_MinorVer>
-        <DCC_ExeOutput>bin\x86\release</DCC_ExeOutput>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_DcuOutput>bin\x86\release</DCC_DcuOutput>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Build>0</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=Pete Goodwin;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=org.imekon.$(MSBuildProjectName)</VerInfo_Keys>
-        <AppEnableHighDPI>true</AppEnableHighDPI>
-        <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
-        <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <VerInfo_MinorVer>0</VerInfo_MinorVer>
-        <VerInfo_Build>0</VerInfo_Build>
-        <VerInfo_MajorVer>1</VerInfo_MajorVer>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <AppEnableHighDPI>true</AppEnableHighDPI>
-        <DCC_ExeOutput>bin\x64\release</DCC_ExeOutput>
-        <DCC_DcuOutput>bin\x64\release</DCC_DcuOutput>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <VerInfo_Keys>CompanyName=Pete Goodwin;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=Copyright (C) 2017 Pete Goodwin;LegalTrademarks=;OriginalFilename=;ProgramID=org.imekon.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <DCC_Optimize>false</DCC_Optimize>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_iOSDevice64)'!=''">
-        <BT_BuildType>Debug</BT_BuildType>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <VerInfo_MajorVer>1</VerInfo_MajorVer>
-        <DCC_DcuOutput>bin\x86\debug</DCC_DcuOutput>
-        <DCC_ExeOutput>bin\x86\debug</DCC_ExeOutput>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Build>0</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=Pete Goodwin;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=org.imekon.$(MSBuildProjectName)</VerInfo_Keys>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_MinorVer>0</VerInfo_MinorVer>
-        <AppEnableHighDPI>true</AppEnableHighDPI>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <VerInfo_MinorVer>0</VerInfo_MinorVer>
-        <VerInfo_Build>33</VerInfo_Build>
-        <VerInfo_MajorVer>1</VerInfo_MajorVer>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <AppEnableHighDPI>true</AppEnableHighDPI>
-        <DCC_ExeOutput>bin\x64\debug</DCC_ExeOutput>
-        <DCC_DcuOutput>bin\x64\debug</DCC_DcuOutput>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <VerInfo_Keys>CompanyName=Pete Goodwin;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.33;InternalName=;LegalCopyright=Copyright (C) 2017 Pete Goodwin;LegalTrademarks=;OriginalFilename=;ProgramID=org.imekon.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <VerInfo_Locale>1033</VerInfo_Locale>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <RcCompile Include="resource.rc">
-            <Form>resource.res</Form>
-        </RcCompile>
-        <DCCReference Include="main.pas">
-            <Form>MainForm</Form>
-        </DCCReference>
-        <DCCReference Include="ABOUT.PAS">
-            <Form>AboutBox</Form>
-        </DCCReference>
-        <DCCReference Include="rgbft.pas">
-            <Form>RGBFTDlg</Form>
-        </DCCReference>
-        <DCCReference Include="texture.pas"/>
-        <DCCReference Include="newscene.pas">
-            <Form>NewSceneDlg</Form>
-        </DCCReference>
-        <DCCReference Include="Scene.pas">
-            <Form>SceneData</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="sphere.pas"/>
-        <DCCReference Include="Plane.pas"/>
-        <DCCReference Include="Light.pas"/>
-        <DCCReference Include="lightedit.pas">
-            <Form>LightEditorDlg</Form>
-        </DCCReference>
-        <DCCReference Include="spotedit.pas">
-            <Form>SpotLightEditorDlg</Form>
-        </DCCReference>
-        <DCCReference Include="areaedit.pas">
-            <Form>AreaLightEditorDlg</Form>
-        </DCCReference>
-        <DCCReference Include="Cube.pas"/>
-        <DCCReference Include="grid.pas">
-            <Form>GridDlg</Form>
-        </DCCReference>
-        <DCCReference Include="zoom.pas">
-            <Form>ZoomDlg</Form>
-        </DCCReference>
-        <DCCReference Include="Solid.pas"/>
-        <DCCReference Include="Polygon.pas"/>
-        <DCCReference Include="shapeinfo.pas">
-            <Form>ShapeInfoDlg</Form>
-        </DCCReference>
-        <DCCReference Include="fileinfo.pas">
-            <Form>FileInfoDlg</Form>
-        </DCCReference>
-        <DCCReference Include="Splash.pas">
-            <Form>SplashScreen</Form>
-        </DCCReference>
-        <DCCReference Include="vector.pas"/>
-        <DCCReference Include="solidedit.pas">
-            <Form>SolidEditor</Form>
-        </DCCReference>
-        <DCCReference Include="misc.pas"/>
-        <DCCReference Include="scenewizdlg.pas">
-            <Form>SceneWizardDlg</Form>
-        </DCCReference>
-        <DCCReference Include="PolyEdit.pas">
-            <Form>PolyEditor</Form>
-        </DCCReference>
-        <DCCReference Include="impdlg.pas">
-            <Form>ImportDlg</Form>
-        </DCCReference>
-        <DCCReference Include="polyscale.pas">
-            <Form>PolyScaleDlg</Form>
-        </DCCReference>
-        <DCCReference Include="user.pas"/>
-        <DCCReference Include="userdlg.pas">
-            <Form>UserDialog</Form>
-        </DCCReference>
-        <DCCReference Include="texttype.pas">
-            <Form>TextTypeDlg</Form>
-        </DCCReference>
-        <DCCReference Include="brick.pas"/>
-        <DCCReference Include="checker.pas"/>
-        <DCCReference Include="hexagon.pas"/>
-        <DCCReference Include="maptext.pas"/>
-        <DCCReference Include="htfld.pas"/>
-        <DCCReference Include="htflddlg.pas">
-            <Form>HeightFieldDialog</Form>
-        </DCCReference>
-        <DCCReference Include="group.pas"/>
-        <DCCReference Include="gallery.pas">
-            <Form>GalleryDialog</Form>
-        </DCCReference>
-        <DCCReference Include="cregal.pas">
-            <Form>GalleryDetailsDialog</Form>
-        </DCCReference>
-        <DCCReference Include="renderdlg.pas">
-            <Form>RenderDialog</Form>
-        </DCCReference>
-        <DCCReference Include="camdlg.pas">
-            <Form>CameraDialog</Form>
-        </DCCReference>
-        <DCCReference Include="browser.pas">
-            <Form>ObjectBrowser</Form>
-        </DCCReference>
-        <DCCReference Include="spheredlg.pas">
-            <Form>SphereDialog</Form>
-        </DCCReference>
-        <DCCReference Include="Bicubic.pas"/>
-        <DCCReference Include="bicubedit.pas">
-            <Form>BicubicEditor</Form>
-        </DCCReference>
-        <DCCReference Include="settings.pas">
-            <Form>SettingsDialog</Form>
-        </DCCReference>
-        <DCCReference Include="disc.pas"/>
-        <DCCReference Include="torus.pas"/>
-        <DCCReference Include="discdlg.pas">
-            <Form>DiscDialog</Form>
-        </DCCReference>
-        <DCCReference Include="torusdlg.pas">
-            <Form>TorusDialog</Form>
-        </DCCReference>
-        <DCCReference Include="super.pas"/>
-        <DCCReference Include="superdlg.pas">
-            <Form>SuperDialog</Form>
-        </DCCReference>
-        <DCCReference Include="crebicubic.pas">
-            <Form>CreateBicubicDialog</Form>
-        </DCCReference>
-        <DCCReference Include="gang.pas">
-            <Form>GangScreen</Form>
-        </DCCReference>
-        <DCCReference Include="crepoly.pas">
-            <Form>CreatePolygonDialog</Form>
-        </DCCReference>
-        <DCCReference Include="meshdlg.pas">
-            <Form>MeshDialog</Form>
-        </DCCReference>
-        <DCCReference Include="pastedlg.pas">
-            <Form>PasteDialog</Form>
-        </DCCReference>
-        <DCCReference Include="text.pas"/>
-        <DCCReference Include="textfm.pas">
-            <Form>TextDialog</Form>
-        </DCCReference>
-        <DCCReference Include="extdlg.pas">
-            <Form>CreateExtrusionDialog</Form>
-        </DCCReference>
-        <DCCReference Include="nsides.pas">
-            <Form>NSidedDialog</Form>
-        </DCCReference>
-        <DCCReference Include="iriddlg.pas">
-            <Form>IridVectorDialog</Form>
-        </DCCReference>
-        <DCCReference Include="turbulence.pas">
-            <Form>TurbulenceDialog</Form>
-        </DCCReference>
-        <DCCReference Include="bricksize.pas">
-            <Form>BrickSizeDialog</Form>
-        </DCCReference>
-        <DCCReference Include="lathedit.pas">
-            <Form>LatheEditor</Form>
-        </DCCReference>
-        <DCCReference Include="julia.pas"/>
-        <DCCReference Include="juliadlg.pas">
-            <Form>JuliaDialog</Form>
-        </DCCReference>
-        <DCCReference Include="halo.pas"/>
-        <DCCReference Include="halodlg.pas">
-            <Form>HaloDialog</Form>
-        </DCCReference>
-        <DCCReference Include="halosdlg.pas">
-            <Form>HalosDialog</Form>
-        </DCCReference>
-        <DCCReference Include="rendmega.pas">
-            <Form>RenderMegaDlg</Form>
-        </DCCReference>
-        <DCCReference Include="grpdet.pas">
-            <Form>GroupDetailsDialog</Form>
-        </DCCReference>
-        <DCCReference Include="anim.pas"/>
-        <DCCReference Include="fogdlg.pas">
-            <Form>FogDialog</Form>
-        </DCCReference>
-        <DCCReference Include="prevdlg.pas">
-            <Form>PreviewDialog</Form>
-        </DCCReference>
-        <DCCReference Include="rebtext.pas">
-            <Form>RebuildTextureForm</Form>
-        </DCCReference>
-        <DCCReference Include="findtext.pas">
-            <Form>FindTextureDialog</Form>
-        </DCCReference>
-        <DCCReference Include="chtextnm.pas">
-            <Form>ChooseTextureNameDialog</Form>
-        </DCCReference>
-        <DCCReference Include="quat.pas"/>
-        <DCCReference Include="layers.pas">
-            <Form>LayersForm</Form>
-        </DCCReference>
-        <DCCReference Include="grpedit.pas">
-            <Form>GroupEditor</Form>
-        </DCCReference>
-        <DCCReference Include="spring.pas"/>
-        <DCCReference Include="textform.pas">
-            <Form>TextureForm</Form>
-        </DCCReference>
-        <DCCReference Include="model_TLB.pas"/>
-        <DCCReference Include="mseimpl.pas">
-            <CoClasses>ModelSceneEditor</CoClasses>
-        </DCCReference>
-        <DCCReference Include="matrix.pas"/>
-        <DCCReference Include="expopt.pas">
-            <Form>ExportOptionsDialog</Form>
-        </DCCReference>
-        <DCCReference Include="rgbframe.pas">
-            <Form>RGBFTFrame</Form>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="turbframe.pas">
-            <Form>TurbulenceFrame</Form>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="tracdbg.pas"/>
-        <DCCReference Include="parser.pas"/>
-        <DCCReference Include="scripted.pas"/>
-        <DCCReference Include="scrdlg.pas">
-            <Form>ScriptedDialog</Form>
-        </DCCReference>
-        <DCCReference Include="scrfildlg.pas">
-            <Form>ScriptFileDialog</Form>
-        </DCCReference>
-        <DCCReference Include="coolray.pas">
-            <Form>CoolRayDialog</Form>
-        </DCCReference>
-        <DCCReference Include="env.pas"/>
-        <DCCReference Include="engine.pas"/>
-        <DCCReference Include="envdlg.pas">
-            <Form>EnvironmentDialog</Form>
-        </DCCReference>
-        <RidlCompile Include="mse.ridl"/>
-        <BuildConfiguration Include="Debug">
+        <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
-        <BuildConfiguration Include="Release">
+        <BuildConfiguration Include="Debug">
             <Key>Cfg_1</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Delphi.Personality.12</Borland.Personality>
-        <Borland.ProjectType/>
+        <Borland.ProjectType>Application</Borland.ProjectType>
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">mse.dpr</Source>
+                    <Source Name="MainSource">convertcolors.dpr</Source>
                 </Source>
-                <Language>
-                    <Language Name="ProjectLang">$00000809</Language>
-                </Language>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                </Excluded_Packages>
             </Delphi.Personality>
-            <Platforms>
-                <Platform value="iOSDevice64">False</Platform>
-                <Platform value="Win32">True</Platform>
-                <Platform value="Win64">True</Platform>
-            </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="ABOUT.PAS" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="mse.ridl" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="bin\x86\debug\mse.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Debug\convertcolors.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>mse.exe</RemoteName>
+                        <RemoteName>convertcolors.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -572,14 +277,6 @@
                         <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.framework</Extensions>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="ProjectUWPManifest">
-                    <Platform Name="Win32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Win64">
-                        <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="iPhone_Launch640">
@@ -694,16 +391,6 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="UWP_DelphiLogo44">
-                    <Platform Name="Win32">
-                        <RemoteDir>Assets</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Win64">
-                        <RemoteDir>Assets</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
                 <DeployClass Name="ProjectiOSEntitlements">
                     <Platform Name="iOSDevice64">
                         <RemoteDir>..\</RemoteDir>
@@ -735,16 +422,6 @@
                 <DeployClass Name="ProjectOSXEntitlements">
                     <Platform Name="OSX32">
                         <RemoteDir>..\</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="UWP_DelphiLogo150">
-                    <Platform Name="Win32">
-                        <RemoteDir>Assets</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="Win64">
-                        <RemoteDir>Assets</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -884,9 +561,14 @@
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
-            <ActiveXProjectInfo>
-                <version>1</version>
-            </ActiveXProjectInfo>
+            <Platforms>
+                <Platform value="Android">False</Platform>
+                <Platform value="iOSDevice32">False</Platform>
+                <Platform value="iOSDevice64">False</Platform>
+                <Platform value="iOSSimulator">False</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">True</Platform>
+            </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

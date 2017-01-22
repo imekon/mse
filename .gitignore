@@ -83,7 +83,7 @@ __recovery/
 *.des
 *.duf
 *.mlb
-*.mtf
+# *.mtf
 *.msi
 *.ray
 *.smp

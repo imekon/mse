@@ -21,7 +21,7 @@ unit main;
 interface
 
 uses
-  System.UITypes, System.Contnrs, System.IOUtils, System.JSON,
+  System.UITypes, System.Contnrs, System.IOUtils, System.JSON, System.Generics.Collections,
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, VCL.Graphics,
   VCL.Forms, VCL.Controls, VCL.Menus,
   VCL.Dialogs, VCL.StdCtrls, VCL.Buttons, VCL.ExtCtrls, VCL.ComCtrls, System.Win.Registry, Texture, Halo, VCL.Tabs,
@@ -307,6 +307,8 @@ type
     AnimationTimer: TTimer;
     StopAction: TAction;
     PlayAction: TAction;
+    ImportTexture1: TMenuItem;
+    ImportTextureAction: TAction;
     procedure ShowHint(Sender: TObject);
     procedure ExitItemClick(Sender: TObject);
     procedure OpenItemClick(Sender: TObject);
@@ -424,6 +426,7 @@ type
     procedure AnimationTimerTimer(Sender: TObject);
     procedure StopActionExecute(Sender: TObject);
     procedure PlayActionExecute(Sender: TObject);
+    procedure OnImportTexture(Sender: TObject);
   private
     { Private declarations }
     CurrentTexture: TTexture;
@@ -454,9 +457,9 @@ type
     POVCommand, POVimageSize, CoolRayCommand: string;
     POVexit: boolean;
     TextureVersion: integer;
-    Halos: TList;
-    Textures: TList;
-    ObjectGallery: TList;
+    Halos: TList<THalo>;
+    Textures: TList<TTexture>;
+    ObjectGallery: TList<TShape>;
     SceneData: TSceneData;
 
     procedure CenterView;
@@ -759,12 +762,12 @@ begin
   reg.Free;
 
   TextureVersion := ModelVersion;
-  Halos := TList.Create;
-  Textures := TList.Create;
+  Halos := TList<THalo>.Create;
+  Textures := TList<TTexture>.Create;
   ModifiedHalos := false;
   ModifiedTextures := False;
 
-  ObjectGallery := TList.Create;
+  ObjectGallery := TList<TShape>.Create;
 
   SceneData := TSceneData.Create;
 
@@ -2103,6 +2106,50 @@ begin
     SceneData.SetMode(mdObserver);
     ObserverItem.Checked := True;
     ObserverBtn.Down := True;
+  end;
+end;
+
+procedure TMainForm.OnImportTexture(Sender: TObject);
+var
+  input: TextFile;
+  texture: TTexture;
+  line, name, r, g, b: string;
+  red, green, blue: single;
+  parameters: TStringList;
+
+begin
+  Textures.Clear;
+  OpenDialog.Filter := 'All files (*.*)|*.*';
+  if OpenDialog.Execute then
+  begin
+    AssignFile(input, OpenDialog.FileName);
+    try
+      Reset(input);
+      parameters := TStringList.Create;
+      while not(eof(input)) do
+      begin
+        ReadLn(input, line);
+        Split(' ', line, parameters);
+        name := parameters[0];
+        r := parameters[1];
+        g := parameters[2];
+        b := parameters[3];
+        red := StrToFloat(r);
+        green := StrToFloat(g);
+        blue := StrToFloat(b);
+        texture := TTexture.Create;
+        texture.Name := name;
+        texture.Red := red;
+        texture.Green := green;
+        texture.Blue := blue;
+        Textures.Add(texture);
+      end;
+      parameters.Free;
+      TextPaintBox.Width := Textures.Count * TextSize;
+      TextPaintBox.Refresh;
+    finally
+      CloseFile(input);
+    end;
   end;
 end;
 
