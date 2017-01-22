@@ -1,4 +1,10 @@
-In Group objects, be able to manipulate the children. The browser seems a good way to do this, since you can see the sub objects within a group. You should be able to edit, delete or add a new object to a group.
+Need
+	RESOURCE.RC and associated files
+	Update textform.pas accordingly
+	
+	textures.mtf file
+	
+	In Group objects, be able to manipulate the children. The browser seems a good way to do this, since you can see the sub objects within a group. You should be able to edit, delete or add a new object to a group.
 
-Difference objects need to be able to select the first object - from which everythin else is subtracted.
+	Difference objects need to be able to select the first object - from which everythin else is subtracted.
 

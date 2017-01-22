@@ -829,7 +829,8 @@ begin
   CurrentTexture := nil;
   SelectedMap := 0;
   NoPreview := TBitmap.Create;
-  NoPreview.LoadFromResourceID(HInstance, 1004);
+  // TODO: need proper RESOURCE.RC and associated files
+  //NoPreview.LoadFromResourceID(HInstance, 1004);
   TextureFolder := TIcon.Create;
   TextureFolder.Handle := LoadIcon(HInstance, MAKEINTRESOURCE(1005));
   Shape.ItemIndex := 0;
