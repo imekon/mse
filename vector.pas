@@ -29,8 +29,9 @@ type
       constructor Create; virtual;
       procedure Copy(original: TVector);
       procedure Save(const name: string; parent: TJSONobject); virtual;
-      procedure SaveToFile(dest: TStream); virtual;
-      procedure LoadFromFile(source: TStream); virtual;
+      //procedure SaveToFile(dest: TStream); virtual;
+      procedure Load(obj: TJSONObject); virtual;
+      //procedure LoadFromFile(source: TStream); virtual;
       function Magnitude: double;
       procedure Normalize;
       function Equal(xx, yy, zz: double): boolean;
@@ -76,19 +77,30 @@ begin
   parent.AddPair(name, obj);
 end;
 
+{*
 procedure TVector.SaveToFile(dest: TStream);
 begin
   dest.WriteBuffer(x, sizeof(x));
   dest.WriteBuffer(y, sizeof(y));
   dest.WriteBuffer(z, sizeof(z));
 end;
+*}
 
+procedure TVector.Load(obj: TJSONObject);
+begin
+  x := obj.GetValue('x').GetValue<single>;
+  y := obj.GetValue('y').GetValue<single>;
+  z := obj.GetValue('z').GetValue<single>;
+end;
+
+{*
 procedure TVector.LoadFromFile(source: TStream);
 begin
   source.ReadBuffer(x, sizeof(x));
   source.ReadBuffer(y, sizeof(y));
   source.ReadBuffer(z, sizeof(z));
 end;
+*}
 
 procedure TVector.Add(v: TVector);
 begin

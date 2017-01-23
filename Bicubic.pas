@@ -154,7 +154,7 @@ begin
     for x:= 0 to 3 do
     begin
       v := Controls[x, y];
-      v.LoadFromFile(source);
+      //v.LoadFromFile(source);
     end;
 end;
 
@@ -185,7 +185,7 @@ begin
     for x := 0 to 3 do
     begin
       v := Controls[x, y];
-      v.SaveToFile(dest);
+      //v.SaveToFile(dest);
     end;
 end;
 

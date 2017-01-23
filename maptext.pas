@@ -31,7 +31,7 @@ type
   public
     Red, Green, Blue, Filter, Transmit, Value: double;
     constructor Create;
-    procedure SaveToFile(dest: TStream);
+    //procedure SaveToFile(dest: TStream);
     procedure LoadFromFile(source: TStream);
     procedure Draw(x: integer; canvas: TCanvas; selected: boolean);
     procedure Copy(original: TMapItem);
@@ -48,8 +48,8 @@ type
     constructor Create; override;
     destructor Destroy; override;
     function GetID: TTextureID; override;
-    procedure SaveToFile(dest: TStream); override;
-    procedure LoadFromFile(source: TStream); override;
+    //procedure SaveToFile(dest: TStream); override;
+    //procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
     procedure Draw(x: integer; canvas: TCanvas); override;
     procedure CreateSimple;
@@ -62,8 +62,8 @@ type
 
     constructor Create; override;
     function GetID: TTextureID; override;
-    procedure SaveToFile(dest: TStream); override;
-    procedure LoadFromFile(source: TStream); override;
+    //procedure SaveToFile(dest: TStream); override;
+    //procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
   end;
 
@@ -82,6 +82,7 @@ begin
   Filter := 0;
 end;
 
+{*
 procedure TMapItem.SaveToFile(dest: TStream);
 begin
   dest.WriteBuffer(Red, sizeof(Red));
@@ -91,6 +92,7 @@ begin
   dest.WriteBuffer(Transmit, sizeof(Transmit));
   dest.WriteBuffer(Value, sizeof(Value));
 end;
+*}
 
 procedure TMapItem.LoadFromFile(source: TStream);
 begin
@@ -179,6 +181,7 @@ begin
   result := tiMap;
 end;
 
+{*
 procedure TMapTexture.SaveToFile(dest: TStream);
 var
   i, n: integer;
@@ -198,7 +201,9 @@ begin
     map.SaveToFile(dest);
   end;
 end;
+*}
 
+{*
 procedure TMapTexture.LoadFromFile(source: TStream);
 var
   i, n: integer;
@@ -218,6 +223,7 @@ begin
     Maps.Add(map);
   end;
 end;
+*}
 
 procedure TMapTexture.Generate(var dest: TextFile);
 var
@@ -298,17 +304,21 @@ begin
   result := tiSpiral;
 end;
 
+{*
 procedure TSpiralTexture.SaveToFile(dest: TStream);
 begin
   inherited SaveToFile(dest);
   dest.WriteBuffer(Arms, sizeof(Arms));
 end;
+*}
 
+{*
 procedure TSpiralTexture.LoadFromFile(source: TStream);
 begin
   inherited LoadFromFile(source);
   source.ReadBuffer(Arms, sizeof(Arms));
 end;
+*}
 
 procedure TSpiralTexture.Generate(var dest: TextFile);
 var

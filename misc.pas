@@ -209,7 +209,7 @@ var
 begin
   result := '';
 
-  reg := TRegistry.Create;
+  reg := TRegistry.Create(KEY_READ);
 
   reg.RootKey := HKEY_LOCAL_MACHINE;
 

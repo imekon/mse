@@ -34,8 +34,8 @@ type
     constructor Create; override;
     function GetID: TTextureID; override;
     procedure Save(parent: TJSONArray); override;
-    procedure SaveToFile(dest: TStream); override;
-    procedure LoadFromFile(source: TStream); override;
+    //procedure SaveToFile(dest: TStream); override;
+    //procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
     procedure Draw(x: integer; canvas: TCanvas); override;
   end;
@@ -74,6 +74,7 @@ begin
   parent.Add(child);
 end;
 
+{*
 procedure TCheckerTexture.SaveToFile(dest: TStream);
 begin
   inherited SaveToFile(dest);
@@ -84,7 +85,9 @@ begin
   dest.WriteBuffer(Filter2, sizeof(Filter2));
   dest.WriteBuffer(Transmit2, sizeof(Transmit2));
 end;
+*}
 
+{*
 procedure TCheckerTexture.LoadFromFile(source: TStream);
 begin
   inherited LoadFromFile(source);
@@ -95,6 +98,7 @@ begin
   source.ReadBuffer(Filter2, sizeof(Filter2));
   source.ReadBuffer(Transmit2, sizeof(Transmit2));
 end;
+*}
 
 procedure TCheckerTexture.Generate(var dest: TextFile);
 begin

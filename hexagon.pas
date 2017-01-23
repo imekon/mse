@@ -35,8 +35,8 @@ type
     constructor Create; override;
     function GetID: TTextureID; override;
     procedure Save(parent: TJSONArray); override;
-    procedure SaveToFile(dest: TStream); override;
-    procedure LoadFromFile(source: TStream); override;
+    //procedure SaveToFile(dest: TStream); override;
+    //procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
   end;
 
@@ -85,6 +85,7 @@ begin
   parent.Add(obj);
 end;
 
+{*
 procedure THexagonTexture.SaveToFile(dest: TStream);
 begin
   inherited SaveToFile(dest);
@@ -101,7 +102,9 @@ begin
   dest.WriteBuffer(Filter3, sizeof(Filter3));
   dest.WriteBuffer(Transmit3, sizeof(Transmit3));
 end;
+*}
 
+{*
 procedure THexagonTexture.LoadFromFile(source: TStream);
 begin
   inherited LoadFromFile(source);
@@ -118,6 +121,7 @@ begin
   source.ReadBuffer(Filter3, sizeof(Filter3));
   source.ReadBuffer(Transmit3, sizeof(Transmit3));
 end;
+*}
 
 procedure THexagonTexture.Generate(var dest: TextFile);
 begin

@@ -60,7 +60,7 @@ type
   TTexture = class(TObject)
   public
     { name of texture }
-    Category, Name: AnsiString;
+    Category, Name: string;
     Selected: boolean;
 
     { transformations }
@@ -98,8 +98,6 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     function GetID: TTextureID; virtual;
-    procedure SaveToFile(dest: TStream); virtual;
-    procedure LoadFromFile(source: TStream); virtual;
     procedure Save(parent: TJSONArray); virtual;
     function GetColour: TColor; virtual;
     function GetPaletteRGB: Longint; virtual;
@@ -130,8 +128,7 @@ type
     constructor Create; override;
     function GetID: TTextureID; override;
     procedure Save(parent: TJSONArray); override;
-    procedure SaveToFile(dest: TStream); override;
-    procedure LoadFromFile(source: TStream); override;
+    //procedure LoadFromFile(source: TStream); override;
   end;
 
   TUserTexture = class(TTexture)
@@ -140,8 +137,7 @@ type
     constructor Create; override;
     function GetID: TTextureID; override;
     procedure Save(parent: TJSONArray); override;
-    procedure SaveToFile(dest: TStream); override;
-    procedure LoadFromFile(source: TStream); override;
+    //procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
   end;
 
@@ -362,68 +358,7 @@ begin
   parent.Add(child);
 end;
 
-procedure TTexture.SaveToFile(dest: TStream);
-var
-  i, n: integer;
-  t: TTextureID;
-  halo: THalo;
-
-begin
-  { write out the type }
-  t := GetID;
-  dest.WriteBuffer(t, sizeof(t));
-
-  { write out the data }
-  SaveStringToStream(Category, dest);
-  SaveStringToStream(Name, dest);
-  Translate.SaveToFile(dest);
-  Scale.SaveToFile(dest);
-  Rotate.SaveToFile(dest);
-  dest.WriteBuffer(Red, sizeof(Red));
-  dest.WriteBuffer(Green, sizeof(Green));
-  dest.WriteBuffer(Blue, sizeof(Blue));
-  dest.WriteBuffer(Filter, sizeof(Filter));
-  dest.WriteBuffer(Transmit, sizeof(Transmit));
-  dest.WriteBuffer(Diffuse, sizeof(Diffuse));
-  dest.WriteBuffer(Brilliance, sizeof(Brilliance));
-  dest.WriteBuffer(Crand, sizeof(Crand));
-  dest.WriteBuffer(Ambient, sizeof(Ambient));
-  dest.WriteBuffer(Reflection, sizeof(Reflection));
-  dest.WriteBuffer(Phong, sizeof(Phong));
-  dest.WriteBuffer(PhongSize, sizeof(PhongSize));
-  dest.WriteBuffer(Specular, sizeof(Specular));
-  dest.WriteBuffer(Roughness, sizeof(Roughness));
-  dest.WriteBuffer(Refraction, sizeof(Refraction));
-  dest.WriteBuffer(IOR, sizeof(IOR));
-  dest.WriteBuffer(Metallic, sizeof(Metallic));
-  dest.WriteBuffer(Caustics, sizeof(Caustics));
-  dest.WriteBuffer(FadeDistance, sizeof(FadeDistance));
-  dest.WriteBuffer(FadePower, sizeof(FadePower));
-  dest.WriteBuffer(Irid, sizeof(Irid));
-  dest.WriteBuffer(IridThickness, sizeof(IridThickness));
-  IridVector.SaveToFile(dest);
-  dest.WriteBuffer(Turbulence, sizeof(Turbulence));
-  dest.WriteBuffer(Octaves, sizeof(Octaves));
-  dest.WriteBuffer(Lambda, sizeof(Lambda));
-  dest.WriteBuffer(Omega, sizeof(Omega));
-
-  dest.WriteBuffer(NormalType, sizeof(NormalType));
-  dest.WriteBuffer(NormalValue, sizeof(NormalValue));
-  dest.WriteBuffer(NormalTurbulence, sizeof(NormalTurbulence));
-  dest.WriteBuffer(NormalOctaves, sizeof(NormalOctaves));
-  dest.WriteBuffer(NormalLambda, sizeof(NormalLambda));
-  dest.WriteBuffer(NormalOmega, sizeof(NormalOmega));
-
-  // Halo count
-  n := Halos.Count;
-  dest.WriteBuffer(n, sizeof(n));
-  for i := 0 to n - 1 do
-  begin
-    halo := Halos[i];
-    SaveStringToStream(halo.Name, dest);
-  end;
-end;
-
+{*
 procedure TTexture.LoadFromFile(source: TStream);
 var
   i, n: integer;
@@ -431,7 +366,6 @@ var
   halo: THalo;
 
 begin
-  { read the data (the type is ignored because its already been read) }
   if MainForm.TextureVersion > 12 then
     LoadStringFromStream(Category, source);
 
@@ -494,6 +428,7 @@ begin
     end;
   end;
 end;
+*}
 
 procedure TTexture.GenerateTransforms(var dest: TextFile);
 begin
@@ -629,7 +564,7 @@ begin
 
   if Different(Transmit, 0) then
     WriteLn(dest, Format('      transparency %6.4f', [Transmit]));
-    
+
   WriteLn(dest, '    }');
 end;
 
@@ -752,14 +687,7 @@ begin
   parent.Add(child);
 end;
 
-procedure TImageTexture.SaveToFile(dest: TStream);
-begin
-  inherited;
-
-  SaveStringToStream(Filename, dest);
-  dest.WriteBuffer(MapType, sizeof(MapType));
-end;
-
+{*
 procedure TImageTexture.LoadFromFile(source: TStream);
 begin
   inherited;
@@ -767,6 +695,7 @@ begin
   LoadStringFromStream(Filename, source);
   source.ReadBuffer(MapType, sizeof(MapType));
 end;
+*}
 
 ////////////////////////////////////////////////////////////////////////////////
 //  TUserTexture
@@ -795,14 +724,7 @@ begin
   parent.Add(child);
 end;
 
-procedure TUserTexture.SaveToFile(dest: TStream);
-begin
-  inherited;
-
-  SaveStringToStream(Declare, dest);
-  SaveStringToStream(Filename, dest);
-end;
-
+{*
 procedure TUserTexture.LoadFromFile(source: TStream);
 begin
   inherited;
@@ -810,6 +732,7 @@ begin
   LoadStringFromStream(Declare, source);
   LoadStringFromStream(Filename, source);
 end;
+*}
 
 procedure TUserTexture.Generate(var dest: TextFile);
 begin

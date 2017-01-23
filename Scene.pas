@@ -21,10 +21,12 @@ unit Scene;
 interface
 
 uses
-  System.Types, System.UITypes, System.JSON, System.IOUtils,
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, VCL.Graphics,
+  System.Types, System.UITypes, System.JSON, System.IOUtils, System.Contnrs,
+  System.SysUtils, System.Classes, System.Math,
+  Winapi.Windows, Winapi.Messages,
+  VCL.Graphics,
   VCL.Controls, VCL.Forms, VCL.Dialogs,
-  VCL.ComCtrls, VCL.Clipbrd, System.Math, Vector, Texture, Matrix, System.Contnrs;
+  VCL.ComCtrls, VCL.Clipbrd, Vector, Texture, Matrix;
 
 const
   d2r = pi / 180.0;
@@ -131,12 +133,11 @@ type
   // Scene layers
   TLayer = class
   public
-    Name: AnsiString;
+    Name: string;
     Visible, Selectable: boolean;
     constructor Create;
     procedure Save(parent: TJSONArray);
-    procedure SaveToFile(dest: TStream);
-    procedure LoadFromFile(source: TStream);
+    procedure Load(obj: TJSONObject);
   end;
 
   // ID's of shapes
@@ -1155,8 +1156,10 @@ var
   i: integer;
 
 begin
+{*
   for i := 1 to 3 do
     Points[i].SaveToFile(dest);
+*}
 end;
 
 procedure TTriangle.LoadFromFile(source: TStream);
@@ -1164,8 +1167,10 @@ var
   i: integer;
 
 begin
+{*
   for i := 1 to 3 do
     Points[i].LoadFromFile(source);
+*}
 end;
 
 function TTriangle.HasAllSelected: boolean;
@@ -1334,20 +1339,11 @@ begin
   parent.Add(obj);
 end;
 
-procedure TLayer.SaveToFile(dest: TStream);
+procedure TLayer.Load(obj: TJSONObject);
 begin
-  SaveStringToStream(Name, dest);
-
-  dest.WriteBuffer(Visible, sizeof(Visible));
-  dest.WriteBuffer(Selectable, sizeof(Selectable));
-end;
-
-procedure TLayer.LoadFromFile(source: TStream);
-begin
-  LoadStringFromStream(Name, source);
-
-  source.ReadBuffer(Visible, sizeof(Visible));
-  source.ReadBuffer(Selectable, sizeof(Selectable));
+  Name := obj.GetValue('name').Value;
+  Visible := obj.GetValue('visible').GetValue<boolean>;
+  Selectable := obj.GetValue('selectable').GetValue<boolean>;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1773,9 +1769,9 @@ begin
   SaveStringToStream(buffer, dest);
 
   // Save properties
-  Translate.SaveToFile(dest);
-  Scale.SaveToFile(dest);
-  Rotate.SaveToFile(dest);
+  //Translate.SaveToFile(dest);
+  //Scale.SaveToFile(dest);
+  //Rotate.SaveToFile(dest);
 end;
 
 procedure TShape.LoadFromFile(source: TStream);
@@ -1822,9 +1818,9 @@ begin
   end;
 
   // Load properties
-  Translate.LoadFromFile(source);
-  Scale.LoadFromFile(source);
-  Rotate.LoadFromFile(source);
+  //Translate.LoadFromFile(source);
+  //Scale.LoadFromFile(source);
+  //Rotate.LoadFromFile(source);
 
   // Load SMPL details
   if (MainForm.SceneData.FileVersion > 8) and (MainForm.SceneData.FileVersion < 14) then
@@ -2445,8 +2441,8 @@ begin
   SaveStringToStream(Name, dest);
 
   // Save properties
-  Observer.SaveToFile(dest);
-  Observed.SaveToFile(dest);
+  //Observer.SaveToFile(dest);
+  //Observed.SaveToFile(dest);
 end;
 
 procedure TCamera.LoadFromFile(source: TStream);
@@ -2455,8 +2451,8 @@ begin
   LoadStringFromStream(Name, source);
 
   // Load properties
-  Observer.LoadFromFile(source);
-  Observed.LoadFromFile(source);
+  //Observer.LoadFromFile(source);
+  //Observed.LoadFromFile(source);
 end;
 
 procedure TCamera.Generate(var dest: TextFile);
@@ -3717,11 +3713,11 @@ begin
     n := Layers.Count;
     dest.WriteBuffer(n, sizeof(n));
 
-    for i := 0 to n - 1 do
+    {*for i := 0 to n - 1 do
     begin
       layer := Layers[i] as TLayer;
       layer.SaveToFile(dest);
-    end;
+    end;*}
 
     n := Shapes.Count;
     dest.WriteBuffer(n, sizeof(n));
@@ -3785,7 +3781,7 @@ begin
     end;
 
     // Read layers
-    if FileVersion > 10 then
+    {*if FileVersion > 10 then
     begin
       source.ReadBuffer(n, sizeof(n));
       for i := 1 to n do
@@ -3794,7 +3790,7 @@ begin
         layer.LoadFromFile(source);
         Layers.Add(layer);
       end;
-    end;
+    end;*}
 
     // Read objects
     source.ReadBuffer(n, sizeof(n));

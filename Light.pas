@@ -417,7 +417,7 @@ end;
 procedure TSpotLight.SaveToFile(dest: TStream);
 begin
   inherited SaveToFile(dest);
-  PointAt.SaveToFile(dest);
+  //PointAt.SaveToFile(dest);
   dest.WriteBuffer(Radius, sizeof(Radius));
   dest.WriteBuffer(Falloff, sizeof(Falloff));
   dest.WriteBuffer(Tightness, sizeof(Tightness));
@@ -426,7 +426,7 @@ end;
 procedure TSpotLight.LoadFromFile(source: TStream);
 begin
   inherited LoadFromFile(source);
-  PointAt.LoadFromFile(source);
+  //PointAt.LoadFromFile(source);
   source.ReadBuffer(Radius, sizeof(Radius));
   source.ReadBuffer(Falloff, sizeof(Falloff));
   source.ReadBuffer(Tightness, sizeof(Tightness));

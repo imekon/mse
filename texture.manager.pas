@@ -138,7 +138,7 @@ begin
     textureType := TTextureId(StrToInt(t));
     case textureType of
       tiTexture: ;
-      tiColor: ;
+      tiColor: texture := TTexture.Create;
       tiAgate: ;
       tiAverage: ;
       tiBozo: ;
@@ -169,6 +169,12 @@ begin
       tiUser: ;
       tiLastTexture: ;
     end;
+
+    texture.Name := textureObj.GetValue('name').Value;
+    texture.Red := StrToFloat(textureObj.GetValue('red').Value);
+    texture.Green := StrToFloat(textureObj.GetValue('green').Value);
+    texture.Blue := StrToFloat(textureObj.GetValue('blue').Value);
+    _textures.Add(texture);
   end;
 
   modified := False;

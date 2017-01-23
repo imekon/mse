@@ -149,9 +149,9 @@ begin
   dest.WriteBuffer(Frequency, sizeof(Frequency));
   dest.WriteBuffer(Phase, sizeof(Phase));
 
-  Translate.SaveToFile(dest);
-  Scale.SaveToFile(dest);
-  Rotate.SaveToFile(dest);
+  //Translate.SaveToFile(dest);
+  //Scale.SaveToFile(dest);
+  //Rotate.SaveToFile(dest);
 
   n := ColourMaps.Count;
 
@@ -160,7 +160,7 @@ begin
   for i := 0 to n - 1 do
   begin
     map := ColourMaps[i];
-    if Assigned(map) then map.SaveToFile(dest);
+    //if Assigned(map) then map.SaveToFile(dest);
   end;
 end;
 
@@ -190,9 +190,9 @@ begin
   source.ReadBuffer(Frequency, sizeof(Frequency));
   source.ReadBuffer(Phase, sizeof(Phase));
 
-  Translate.LoadFromFile(source);
-  Scale.LoadFromFile(source);
-  Rotate.LoadFromFile(source);
+  //Translate.LoadFromFile(source);
+  //Scale.LoadFromFile(source);
+  //Rotate.LoadFromFile(source);
 
   source.ReadBuffer(n, sizeof(n));
 

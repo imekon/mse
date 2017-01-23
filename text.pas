@@ -92,7 +92,7 @@ begin
   SaveStringToStream(Font, dest);
   SaveStringToStream(Text, dest);
   dest.WriteBuffer(Thickness, sizeof(Thickness));
-  Offset.SaveToFile(dest);
+  //Offset.SaveToFile(dest);
 end;
 
 procedure TText.LoadFromFile(source: TStream);
@@ -102,7 +102,7 @@ begin
   LoadStringFromStream(Font, source);
   LoadStringFromStream(Text, source);
   source.ReadBuffer(Thickness, sizeof(Thickness));
-  Offset.LoadFromFile(source);
+  //Offset.LoadFromFile(source);
 
   Build;
 end;
