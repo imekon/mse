@@ -402,7 +402,7 @@ var
 
 begin
   texture := ATexture.Create;
-  texture.Name := 'Texture' + IntToStr(MainForm.Textures.Count);
+  texture.Name := 'Texture' + IntToStr(MainForm.TextureManager.Textures.Count);
   result := texture
 end;
 
@@ -414,7 +414,7 @@ begin
   map := TMapTexture.Create;
 
   map.MapType := AType;
-  map.Name := 'Map' + IntToStr(MainForm.Textures.Count);
+  map.Name := 'Map' + IntToStr(MainForm.TextureManager.Textures.Count);
   map.CreateSimple;
 
   result := map
@@ -428,7 +428,7 @@ begin
   map := TSpiralTexture.Create;
 
   map.MapType := AType;
-  map.Name := 'Spiral' + IntToStr(MainForm.Textures.Count);
+  map.Name := 'Spiral' + IntToStr(MainForm.TextureManager.Textures.Count);
   map.CreateSimple;
 
   result := map
@@ -485,8 +485,8 @@ begin
 
     if texture <> nil then
     begin
-      MainForm.Textures.Add(texture);
-      MainForm.TextPaintBox.Width := MainForm.Textures.Count * TextSize;
+      MainForm.TextureManager.Textures.Add(texture);
+      MainForm.TextPaintBox.Width := MainForm.TextureManager.Textures.Count * TextSize;
       MainForm.TextPaintBox.Refresh;
 
       node := AddTexture(texture);
@@ -585,9 +585,9 @@ begin
   TextureImage.AddIcon(TextureFolder);
 
   // Walk the list of textures
-  for i := 0 to MainForm.Textures.Count - 1 do
+  for i := 0 to MainForm.TextureManager.Textures.Count - 1 do
   begin
-    texture := MainForm.Textures[i];
+    texture := MainForm.TextureManager.Textures[i];
     AddTexture(texture);
   end;
 
@@ -1375,14 +1375,14 @@ begin
 
         if Length(user.Name) > 0 then
         begin
-          MainForm.Textures.Add(user);
+          MainForm.TextureManager.Textures.Add(user);
 
           AddTexture(user);
         end
         else
           user.Free;
       end;
-      MainForm.TextPaintBox.Width := MainForm.Textures.Count * TextSize;
+      MainForm.TextPaintBox.Width := MainForm.TextureManager.Textures.Count * TextSize;
       MainForm.TextPaintBox.Refresh;
     finally
       source.Free;

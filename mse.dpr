@@ -119,7 +119,8 @@ uses
   coolray in 'coolray.pas' {CoolRayDialog},
   env in 'env.pas',
   engine in 'engine.pas',
-  envdlg in 'envdlg.pas' {EnvironmentDialog};
+  envdlg in 'envdlg.pas' {EnvironmentDialog},
+  texture.manager in 'texture.manager.pas';
 
 {$R *.TLB}
 

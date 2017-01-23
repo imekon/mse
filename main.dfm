@@ -667,13 +667,13 @@ object MainForm: TMainForm
         Control = ToolBar
         ImageIndex = -1
         MinHeight = 22
-        Width = 1003
+        Width = 1008
       end
       item
         Control = EditPanel
         ImageIndex = -1
         MinHeight = 40
-        Width = 1003
+        Width = 1008
       end>
     EdgeBorders = [ebTop]
     object EditPanel: TPanel
@@ -2200,7 +2200,7 @@ object MainForm: TMainForm
     Left = 195
     Top = 127
     Bitmap = {
-      494C0101140018001C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010114001800240010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000006000000001002000000000000060
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

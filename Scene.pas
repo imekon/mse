@@ -637,16 +637,16 @@ begin
   Z := zf;
 
   while shape <> nil do
-    begin
+  begin
     if sfCanScale in shape.Features then
-      begin
-        xf := xf * shape.Scale.X;
-        yf := yf * shape.Scale.Y;
-        zf := zf * shape.Scale.Z;
-      end;
+    begin
+      xf := xf * shape.Scale.X;
+      yf := yf * shape.Scale.Y;
+      zf := zf * shape.Scale.Z;
+    end;
 
     if sfCanRotate in shape.Features then
-      begin
+    begin
       { rotate about z axis }
       RotatePointZ(xf, yf, zf, xt, yt, zt, d2r * shape.Rotate.Z);
 
@@ -676,17 +676,17 @@ begin
       zt := zf * cosx - yf * sinx;}
       yf := yt;
       zf := zt;
-      end;
+    end;
 
     if sfCanTranslate in shape.Features then
-      begin
+    begin
         xf := xf + shape.Translate.X;
         yf := yf + shape.Translate.Y;
         zf := zf + shape.Translate.Z;
-      end;
+    end;
 
     shape := shape.Parent;
-    end;
+  end;
 end;
 
 procedure TCoord.Make(scene: TSceneData; shape: TShape);
@@ -705,9 +705,9 @@ begin
   Transform(shape, xf, yf, zf);
 
   if Scene.View = vwCamera then
-    begin
+  begin
     if Scene.CurrentCamera <> nil then
-      begin
+    begin
         { Calculate angles }
         with Scene.CurrentCamera do
         begin
@@ -764,55 +764,55 @@ begin
 
         Point.X := trunc(xf);
         Point.Y := trunc(-yf);
-      end
     end
+  end
   else
-    begin
-      Transformed.x := xf;
-      Transformed.y := yf;
-      Transformed.z := zf;
+  begin
+  Transformed.x := xf;
+  Transformed.y := yf;
+  Transformed.z := zf;
 
-      xx := trunc((xf * ViewSize) / ViewRange);
-      yy := trunc((yf * ViewSize) / ViewRange);
-      zz := trunc((zf * ViewSize) / ViewRange);
+  xx := trunc((xf * ViewSize) / ViewRange);
+  yy := trunc((yf * ViewSize) / ViewRange);
+  zz := trunc((zf * ViewSize) / ViewRange);
 
-      case scene.View of
-        vwFront:
-          begin
-          	Point.x := xx;
-            Point.y := -yy;
-          end;
+  case scene.View of
+    vwFront:
+      begin
+        Point.x := xx;
+        Point.y := -yy;
+      end;
 
-        vwBack:
-          begin
-            Point.x := -xx;
-            Point.y := -yy;
-          end;
+    vwBack:
+      begin
+        Point.x := -xx;
+        Point.y := -yy;
+      end;
 
-        vwTop:
-          begin
-            Point.x := xx;
-            Point.y := -zz;
-          end;
+    vwTop:
+      begin
+        Point.x := xx;
+        Point.y := -zz;
+      end;
 
-        vwBottom:
-          begin
-            Point.x := xx;
-            Point.y := zz;
-          end;
+    vwBottom:
+      begin
+        Point.x := xx;
+        Point.y := zz;
+      end;
 
-        vwLeft:
-          begin
-            Point.x := -zz;
-            Point.y := -yy;
-          end;
+    vwLeft:
+      begin
+        Point.x := -zz;
+        Point.y := -yy;
+      end;
 
-        vwRight:
-          begin
-            Point.x := zz;
-            Point.y := -yy;
-          end;
-        end;
+    vwRight:
+      begin
+        Point.x := zz;
+        Point.y := -yy;
+      end;
+    end;
 
     if scene.ScaleMult <> scene.ScaleDiv then
     begin
@@ -3837,9 +3837,9 @@ begin
     WriteLn(dest, '// Textures...');
     WriteLn(dest);
 
-    for i := 0 to MainForm.Textures.Count - 1 do
+    for i := 0 to MainForm.TextureManager.Textures.Count - 1 do
     begin
-      texture := MainForm.Textures[i];
+      texture := MainForm.TextureManager.Textures[i];
       if UsingTexture(texture) then
         texture.Generate(dest);
     end;

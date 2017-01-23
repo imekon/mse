@@ -24,7 +24,8 @@ uses
   System.UITypes, System.Contnrs, System.IOUtils, System.JSON, System.Generics.Collections,
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, VCL.Graphics,
   VCL.Forms, VCL.Controls, VCL.Menus,
-  VCL.Dialogs, VCL.StdCtrls, VCL.Buttons, VCL.ExtCtrls, VCL.ComCtrls, System.Win.Registry, Texture, Halo, VCL.Tabs,
+  VCL.Dialogs, VCL.StdCtrls, VCL.Buttons, VCL.ExtCtrls, VCL.ComCtrls,
+  System.Win.Registry, Texture, Texture.Manager, Halo, VCL.Tabs,
   Scene, VCL.ToolWin, VCL.ImgList, VCL.ActnList, System.ImageList, System.Actions;
 
 {$INCLUDE DirectX.inc}
@@ -443,9 +444,6 @@ type
 
     procedure LoadHalos(const Name: string);
     procedure SaveHalos(const Name: string);
-    procedure LoadTexture(source: TStream);
-    procedure LoadTextures(const Name: string);
-    procedure SaveTextures(const Name: string);
     procedure ImportMap(const Name: string);
     procedure ImportUDO(const name: string);
     procedure SetCaption(const Name: string);
@@ -458,7 +456,7 @@ type
     POVexit: boolean;
     TextureVersion: integer;
     Halos: TList<THalo>;
-    Textures: TList<TTexture>;
+    TextureManager: TTextureManager;
     ObjectGallery: TList<TShape>;
     SceneData: TSceneData;
 
@@ -500,9 +498,9 @@ var
 
 begin
   result := nil;
-  for i := 0 to Textures.Count - 1 do
+  for i := 0 to TextureManager.Textures.Count - 1 do
   begin
-    texture := Textures[i];
+    texture := TextureManager.Textures[i];
     if Texture.Name = name then
     begin
       result := texture;
@@ -591,8 +589,8 @@ begin
         maptext.Maps.Add(mapitem);
       end;
     end;
-    Textures.Add(maptext);
-    TextPaintBox.Width := Textures.Count * TextSize;
+    TextureManager.Textures.Add(maptext);
+    TextPaintBox.Width := TextureManager.Textures.Count * TextSize;
     TextPaintBox.Refresh;
   finally
     CloseFile(map);
@@ -763,7 +761,7 @@ begin
 
   TextureVersion := ModelVersion;
   Halos := TList<THalo>.Create;
-  Textures := TList<TTexture>.Create;
+  TextureManager := TTextureManager.Create;
   ModifiedHalos := false;
   ModifiedTextures := False;
 
@@ -783,39 +781,14 @@ begin
   name := GetModelDirectory + '\Textures.mtf';
 
   if FileExists(name) then
-    LoadTextures(name)
+    TextureManager.LoadTextures(name)
   else
   begin
     name := GetModelDirectory + '\Textures.mlb';
-
-    if FileExists(name) then
-    begin
-      AssignFile(source, name);
-      try
-        Screen.Cursor := crHourglass;
-        Reset(source);
-        while not eof(source) do
-        begin
-          readln(source, name);
-          readln(source, r, g, b);
-
-          texture := TTexture.Create;
-
-          texture.Name := name;
-          texture.Red := r;
-          texture.Green := g;
-          texture.Blue := b;
-
-          Textures.Add(texture);
-        end;
-        CloseFile(source);
-      finally
-        Screen.Cursor := crDefault;
-      end;
-    end;
+    TextureManager.LoadBasicTextures(name);
   end;
 
-  TextPaintBox.Width := Textures.Count * TextSize;
+  TextPaintBox.Width := TextureManager.Textures.Count * TextSize;
 
   // Load file parameter (if there is one)
   if ParamCount > 0 then
@@ -855,7 +828,7 @@ begin
     RealizePalette(Handle);
   end;
 
-  for i := 0 to Textures.Count - 1 do
+  for i := 0 to TextureManager.Textures.Count - 1 do
   begin
     rect.left := i * TextSize;
     rect.right := (i + 1) * TextSize;
@@ -864,7 +837,7 @@ begin
 
     if IntersectRect(rect2, rect, TextPaintBox.Canvas.ClipRect) then
     begin
-      texture := Textures[i];
+      texture := TextureManager.Textures[i];
       texture.Draw(i * TextSize, TextPaintBox.Canvas);
     end;
   end;
@@ -878,8 +851,8 @@ var
 
 begin
   i := X div TextSize;
-  if (i >= 0) and (i < Textures.Count) then
-    result := Textures[i]
+  if (i >= 0) and (i < TextureManager.Textures.Count) then
+    result := TextureManager.Textures[i]
   else
     result := nil;
 end;
@@ -965,8 +938,8 @@ begin
         if ModifiedHalos then
           SaveHalos('halos.mhf');
 
-        if ModifiedTextures then
-          SaveTextures('textures.mtf');
+        if TextureManager.IsModified then
+          TextureManager.SaveTextures('textures.mtf');
 
         result := True;
       end;
@@ -1019,9 +992,9 @@ var
   texture: TTexture;
 
 begin
-  for i := 0 to Textures.Count - 1 do
+  for i := 0 to TextureManager.Textures.Count - 1 do
   begin
-    texture := Textures[i];
+    texture := TextureManager.Textures[i];
     list.Items.AddObject(texture.Name, texture);
   end;
   list.ItemIndex := 0;
@@ -1610,7 +1583,7 @@ begin
   dlg := TFileInfoDlg.Create(Application);
 
   dlg.Objects.Text := IntToStr(SceneData.Shapes.Count);
-  dlg.Textures.Text := IntToStr(Textures.Count);
+  dlg.Textures.Text := IntToStr(TextureManager.Textures.Count);
 
   dlg.ShowModal;
   dlg.Free;
@@ -1900,88 +1873,6 @@ begin
   end;
 end;
 
-procedure TMainForm.LoadTexture(source: TStream);
-var
-  ID: TTextureID;
-  texture: TTexture;
-
-begin
-  source.ReadBuffer(ID, sizeof(ID));
-
-  case ID of
-    tiColor:    texture := TTexture.Create;
-    tiBrick:    texture := TBrickTexture.Create;
-    tiChecker:  texture := TCheckerTexture.Create;
-    tiHexagon:  texture := THexagonTexture.Create;
-    tiMap:      texture := TMapTexture.Create;
-    tiSpiral:   texture := TSpiralTexture.Create;
-    tiImage:    texture := TImageTexture.Create;
-  else
-    texture := nil;
-  end;
-
-  if texture <> nil then
-  begin
-    texture.LoadFromFile(source);
-    Textures.Add(texture);
-  end;
-end;
-
-procedure TMainForm.LoadTextures(const Name: string);
-var
-  i, n: integer;
-  source: TFileStream;
-  buffer: array [0..4] of AnsiChar;
-
-begin
-  Textures.Clear;
-  source := TFileStream.Create(Name, fmOpenRead);
-  try
-    source.ReadBuffer(buffer, 4);
-    buffer[4] := chr(0);
-
-    if buffer = 'MODL' then
-      source.ReadBuffer(TextureVersion, sizeof(TextureVersion))
-    else
-    begin
-      TextureVersion := 7;
-      source.Position := 0;
-    end;
-
-    source.ReadBuffer(n, sizeof(n));
-    for i := 0 to n - 1 do
-      LoadTexture(source);
-
-  finally
-    source.Free;
-    ModifiedTextures := False;
-  end;
-end;
-
-procedure TMainForm.SaveTextures(const Name: string);
-var
-  i, n: integer;
-  texture: TTexture;
-  root: TJSONObject;
-  scene: TJSONArray;
-  text: string;
-
-begin
-  root := TJSONObject.Create;
-  scene := TJSONArray.Create;
-  n := Textures.Count;
-  for i := 0 to n - 1 do
-  begin
-    texture := Textures[i];
-    texture.Save(scene);
-  end;
-  root.AddPair('textures', scene);
-  text := root.ToJSON;
-  TFile.WriteAllText(name, text);
-
-  ModifiedTextures := False;
-end;
-
 procedure TMainForm.LoadTexturesItemClick(Sender: TObject);
 begin
   OpenDialog.Filename := 'textures.mtf';
@@ -1989,7 +1880,7 @@ begin
   OpenDialog.Filter := 'Texture files (*.mtf)|*.mtf';
   if OpenDialog.Execute then
   begin
-    LoadTextures(OpenDialog.Filename);
+    TextureManager.LoadTextures(OpenDialog.Filename);
     TextPaintBox.Refresh;
   end;
 end;
@@ -2000,7 +1891,7 @@ begin
   SaveDialog.DefaultExt := 'mtf';
   SaveDialog.Filter := 'Texture files (*.mtf)|*.mtf';
   if SaveDialog.Execute then
-    SaveTextures(SaveDialog.Filename);
+    TextureManager.SaveTextures(SaveDialog.Filename);
 end;
 
 procedure TMainForm.HelpIndexItemClick(Sender: TObject);
@@ -2110,46 +2001,13 @@ begin
 end;
 
 procedure TMainForm.OnImportTexture(Sender: TObject);
-var
-  input: TextFile;
-  texture: TTexture;
-  line, name, r, g, b: string;
-  red, green, blue: single;
-  parameters: TStringList;
-
 begin
-  Textures.Clear;
   OpenDialog.Filter := 'All files (*.*)|*.*';
   if OpenDialog.Execute then
   begin
-    AssignFile(input, OpenDialog.FileName);
-    try
-      Reset(input);
-      parameters := TStringList.Create;
-      while not(eof(input)) do
-      begin
-        ReadLn(input, line);
-        Split(' ', line, parameters);
-        name := parameters[0];
-        r := parameters[1];
-        g := parameters[2];
-        b := parameters[3];
-        red := StrToFloat(r);
-        green := StrToFloat(g);
-        blue := StrToFloat(b);
-        texture := TTexture.Create;
-        texture.Name := name;
-        texture.Red := red;
-        texture.Green := green;
-        texture.Blue := blue;
-        Textures.Add(texture);
-      end;
-      parameters.Free;
-      TextPaintBox.Width := Textures.Count * TextSize;
-      TextPaintBox.Refresh;
-    finally
-      CloseFile(input);
-    end;
+    TextureManager.ImportTextures(OpenDialog.Filename);
+    TextPaintBox.Width := TextureManager.Textures.Count * TextSize;
+    TextPaintBox.Refresh;
   end;
 end;
 
