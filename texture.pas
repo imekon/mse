@@ -99,6 +99,7 @@ type
     destructor Destroy; override;
     function GetID: TTextureID; virtual;
     procedure Save(parent: TJSONArray); virtual;
+    procedure Load(obj: TJSONObject); virtual;
     function GetColour: TColor; virtual;
     function GetPaletteRGB: Longint; virtual;
     function ConvertPaletteRGB(r, g, b: double): longint; virtual;
@@ -253,6 +254,14 @@ end;
 function TTexture.IsMapTexture: boolean;
 begin
   result := false;
+end;
+
+procedure TTexture.Load(obj: TJSONObject);
+begin
+  Name := obj.GetValue('name').Value;
+  Red := StrToFloat(obj.GetValue('red').Value);
+  Green := StrToFloat(obj.GetValue('green').Value);
+  Blue := StrToFloat(obj.GetValue('blue').Value);
 end;
 
 procedure TTexture.DrawSelected(x: integer; canvas: TCanvas);

@@ -170,10 +170,7 @@ begin
       tiLastTexture: ;
     end;
 
-    texture.Name := textureObj.GetValue('name').Value;
-    texture.Red := StrToFloat(textureObj.GetValue('red').Value);
-    texture.Green := StrToFloat(textureObj.GetValue('green').Value);
-    texture.Blue := StrToFloat(textureObj.GetValue('blue').Value);
+    texture.Load(textureObj);
     _textures.Add(texture);
   end;
 
