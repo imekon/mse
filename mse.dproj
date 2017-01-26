@@ -164,7 +164,7 @@
         <AppEnableHighDPI>true</AppEnableHighDPI>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <VerInfo_Build>40</VerInfo_Build>
+        <VerInfo_Build>45</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
         <VerInfo_MinorVer>0</VerInfo_MinorVer>
@@ -174,7 +174,7 @@
         <DCC_ExeOutput>bin\x64\debug</DCC_ExeOutput>
         <DCC_DcuOutput>bin\x64\debug</DCC_DcuOutput>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <VerInfo_Keys>CompanyName=Pete Goodwin;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.40;InternalName=;LegalCopyright=Copyright (C) 2017 Pete Goodwin;LegalTrademarks=;OriginalFilename=;ProgramID=org.imekon.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Pete Goodwin;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.45;InternalName=;LegalCopyright=Copyright (C) 2017 Pete Goodwin;LegalTrademarks=;OriginalFilename=;ProgramID=org.imekon.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <ItemGroup>

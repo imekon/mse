@@ -653,9 +653,11 @@ end;
 
 procedure DisplaySplashScreen;
 begin
+{$IFNDEF DEBUG}
   SplashScreen := TSplashScreen.Create(Application);
   SplashScreen.Show;
   SplashScreen.Refresh;
+{$ENDIF}
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);

@@ -124,21 +124,21 @@ type
 
   TImageTexture = class(TTexture)
   public
-    Filename: AnsiString;
+    Filename: string;
     MapType: integer;
     constructor Create; override;
     function GetID: TTextureID; override;
     procedure Save(parent: TJSONArray); override;
-    //procedure LoadFromFile(source: TStream); override;
+    procedure Load(obj: TJSONObject); override;
   end;
 
   TUserTexture = class(TTexture)
   public
-    Declare, Filename: AnsiString;
+    Declare, Filename: string;
     constructor Create; override;
     function GetID: TTextureID; override;
     procedure Save(parent: TJSONArray); override;
-    //procedure LoadFromFile(source: TStream); override;
+    procedure Load(obj: TJSONObject); override;
     procedure Generate(var dest: TextFile); override;
   end;
 
@@ -683,6 +683,13 @@ begin
   result := tiImage;
 end;
 
+procedure TImageTexture.Load(obj: TJSONObject);
+begin
+  inherited;
+  MapType := StrToInt(obj.GetValue('maptype').Value);
+  Filename := obj.GetValue('filename').Value;
+end;
+
 procedure TImageTexture.Save(parent: TJSONArray);
 var
   child: TJSONObject;
@@ -695,16 +702,6 @@ begin
   child.AddPair('filename', Filename);
   parent.Add(child);
 end;
-
-{*
-procedure TImageTexture.LoadFromFile(source: TStream);
-begin
-  inherited;
-
-  LoadStringFromStream(Filename, source);
-  source.ReadBuffer(MapType, sizeof(MapType));
-end;
-*}
 
 ////////////////////////////////////////////////////////////////////////////////
 //  TUserTexture
@@ -720,6 +717,13 @@ begin
   result := tiUser;
 end;
 
+procedure TUserTexture.Load(obj: TJSONObject);
+begin
+  inherited;
+  Declare := obj.GetValue('declare').Value;
+  Filename := obj.GetValue('filename').Value;
+end;
+
 procedure TUserTexture.Save(parent: TJSONArray);
 var
   child: TJSONObject;
@@ -732,16 +736,6 @@ begin
   child.AddPair('filename', Filename);
   parent.Add(child);
 end;
-
-{*
-procedure TUserTexture.LoadFromFile(source: TStream);
-begin
-  inherited;
-
-  LoadStringFromStream(Declare, source);
-  LoadStringFromStream(Filename, source);
-end;
-*}
 
 procedure TUserTexture.Generate(var dest: TextFile);
 begin
