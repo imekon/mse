@@ -22,7 +22,8 @@ interface
 
 uses
   System.Types, System.UITypes, System.JSON, System.IOUtils, System.Contnrs,
-  System.SysUtils, System.Classes, System.Math,
+  System.SysUtils, System.Classes, System.Math, System.Generics.Defaults,
+  System.Generics.Collections,
   Winapi.Windows, Winapi.Messages,
   VCL.Graphics,
   VCL.Controls, VCL.Forms, VCL.Dialogs,
@@ -58,7 +59,7 @@ type
   TAnchorType = (anTranslate, anScale, anRotate);
 
   TShape = class;
-  TSceneData = class;
+  TSceneManager = class;
 
   // A vector object with support routines
   TCoord = class(TVector)
@@ -78,9 +79,9 @@ type
       destructor Destroy; override;
       procedure CopyCoord(original: TCoord);
       procedure Transform(shape: TShape; var xf, yf, zf: double);
-      procedure Make(scene: TSceneData; shape: TShape);
-      procedure MakeInShape(scene: TSceneData; shape: TShape);
-      procedure DrawPolygon(scene: TSceneData; canvas: TCanvas;
+      procedure Make(scene: TSceneManager; shape: TShape);
+      procedure MakeInShape(scene: TSceneManager; shape: TShape);
+      procedure DrawPolygon(scene: TSceneManager; canvas: TCanvas;
         view: TView; first: boolean);
       procedure SetSelected(select: boolean);
       procedure ToggleSelected;
@@ -108,11 +109,11 @@ type
       procedure Copy(original: TTriangle);
       procedure ResetBounding;
       procedure AdjustBounding(x, y: integer);
-      procedure Make(scene: TSceneData; shape: TShape);
-      procedure MakeInShape(scene: TSceneData; shape: TShape);
+      procedure Make(scene: TSceneManager; shape: TShape);
+      procedure MakeInShape(scene: TSceneManager; shape: TShape);
       procedure Draw(canvas: TCanvas);
-      procedure DrawFilled(scene: TSceneData; canvas: TCanvas);
-      procedure DrawPolygon(scene: TSceneData; canvas: TCanvas; view: TView);
+      procedure DrawFilled(scene: TSceneManager; canvas: TCanvas);
+      procedure DrawPolygon(scene: TSceneManager; canvas: TCanvas; view: TView);
       procedure Save(const name: string; parent: TJSONArray);
       procedure SaveToFile(dest: TStream);
       procedure LoadFromFile(source: TStream);
@@ -214,22 +215,22 @@ type
       function CheckTexture: boolean; virtual;
       procedure Info; virtual;
       function UsingTexture(text: TTexture): boolean; virtual;
-      procedure Make(scene: TSceneData; theTriangles: TList); virtual;
-      procedure MakeInShape(scene: TSceneData; shape: TShape; theTriangles: TList);
+      procedure Make(scene: TSceneManager; theTriangles: TList); virtual;
+      procedure MakeInShape(scene: TSceneManager; shape: TShape; theTriangles: TList);
       function IsVisible(canvas: TCanvas): boolean; virtual;
-      procedure DrawTexture(Scene: TSceneData; canvas: TCanvas); virtual;
-      procedure DrawSelected(Scene: TSceneData; canvas: TCanvas); virtual;
-      procedure Draw(Scene: TSceneData; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); virtual;
+      procedure DrawTexture(Scene: TSceneManager; canvas: TCanvas); virtual;
+      procedure DrawSelected(Scene: TSceneManager; canvas: TCanvas); virtual;
+      procedure Draw(Scene: TSceneManager; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); virtual;
       procedure SetTexture(ATexture: TTexture); virtual;
       procedure SetAnchor(AnchorType: TAnchorType);
-      procedure SetTranslate(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
-      procedure SetTranslateAnchor(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
-      procedure SetScale(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
-      procedure SetScaleAnchor(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
-      procedure SetUniformScaleAnchor(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
-      procedure SetRotate(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
-      procedure SetObserver(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean); virtual;
-      procedure SetObserved(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean); virtual;
+      procedure SetTranslate(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
+      procedure SetTranslateAnchor(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
+      procedure SetScale(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
+      procedure SetScaleAnchor(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
+      procedure SetUniformScaleAnchor(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
+      procedure SetRotate(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
+      procedure SetObserver(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean); virtual;
+      procedure SetObserved(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean); virtual;
       function GetObserver: TVector; virtual;
       function GetObserved: TVector; virtual;
       procedure AddTriangle(i, j, k: TVector);
@@ -273,12 +274,12 @@ type
     destructor Destroy; override;
     function GetID: TShapeID; override;
     function CheckTexture: boolean; override;
-    procedure SetObserver(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean); override;
-    procedure SetObserved(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean); override;
+    procedure SetObserver(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean); override;
+    procedure SetObserved(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean); override;
     function GetObserver: TVector; override;
     function GetObserved: TVector; override;
-    procedure Draw(Scene: TSceneData; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); override;
-    procedure Make(scene: TSceneData; theTriangles: TList); override;
+    procedure Draw(Scene: TSceneManager; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); override;
+    procedure Make(scene: TSceneManager; theTriangles: TList); override;
     procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
@@ -384,11 +385,17 @@ type
     procedure Edit;
   end;
 
+  TTriangleComparer = class(TInterfacedObject, IComparer<TTriangle>)
+  public
+    function Compare(const t1, t2: TTriangle): Integer;
+  end;
+
+
   //////////////////////////////////////////////////////////////////////////////
   //  TSceneData
   //////////////////////////////////////////////////////////////////////////////
 
-  TSceneData = class
+  TSceneManager = class
   private
     { Private declarations }
     Modified: boolean;
@@ -414,9 +421,9 @@ type
     // Undo item for dragging
     UndoDrag: TUndo;
 
-    ZBuffer: TObjectList;
+    ZBuffer: TList<TTriangle>;
     UndoIndex: integer;
-    UndoBuffer: TObjectList;
+    UndoBuffer: TList<TUndo>;
 
     ScriptFiles: TList;       // Cache of script files
 
@@ -427,12 +434,12 @@ type
     procedure Anchor;
     procedure CalculateSetRotation(xx, yy, zz: double);
     function UsingTexture(texture: TTexture): boolean;
-    procedure CalculateZBuffer(list: TList);
+    procedure CalculateZBuffer(list: TList<TTriangle>);
   public
     { Public declarations }
     FileVersion: integer;
-    Shapes: TObjectList;
-    Layers: TObjectList;
+    Shapes: TList<TShape>;
+    Layers: TList<TLayer>;
     CreateExtrusion: boolean;
     AnimationPosition: Cardinal;
 
@@ -522,6 +529,8 @@ type
     function FindScriptFile(const name: string): TScriptFile;
 
     procedure NextFrame;
+
+    class function CreateShapeFromID(ID: TShapeID): TShape;
   end;
 
 const
@@ -543,7 +552,6 @@ const
      'SuperEllipsoid', 'Text', 'Lathe', 'JuliaFractal', 'Reserved1',
      'Reserved2', 'Spring', 'Scripted', 'Environment', 'LastShape');
 
-function CreateShapeFromID(ID: TShapeID): TShape;
 procedure RotatePointX(xf, yf, zf: double; var xt, yt, zt: double; angle: double);
 procedure RotatePointY(xf, yf, zf: double; var xt, yt, zt: double; angle: double);
 procedure RotatePointZ(xf, yf, zf: double; var xt, yt, zt: double; angle: double);
@@ -690,7 +698,7 @@ begin
   end;
 end;
 
-procedure TCoord.Make(scene: TSceneData; shape: TShape);
+procedure TCoord.Make(scene: TSceneManager; shape: TShape);
 var
   xx, yy, zz: integer;
   xf, yf, zf: double;
@@ -839,11 +847,11 @@ begin
     shape.Bounding.bottom := Point.y + 1;
 end;
 
-procedure TCoord.MakeInShape(scene: TSceneData; shape: TShape);
+procedure TCoord.MakeInShape(scene: TSceneManager; shape: TShape);
 begin
 end;
 
-procedure TCoord.DrawPolygon(scene: TSceneData; canvas: TCanvas;
+procedure TCoord.DrawPolygon(scene: TSceneManager; canvas: TCanvas;
   view: TView; first: boolean);
 var
   xx, yy: integer;
@@ -1036,7 +1044,7 @@ begin
     Bounding.bottom := y;
 end;
 
-procedure TTriangle.Make(scene: TSceneData; shape: TShape);
+procedure TTriangle.Make(scene: TSceneManager; shape: TShape);
 var
   i: integer;
 
@@ -1060,7 +1068,7 @@ begin
   end;
 end;
 
-procedure TTriangle.MakeInShape(scene: TSceneData; shape: TShape);
+procedure TTriangle.MakeInShape(scene: TSceneManager; shape: TShape);
 begin
 end;
 
@@ -1076,7 +1084,7 @@ begin
     end;
 end;
 
-procedure TTriangle.DrawFilled(scene: TSceneData; canvas: TCanvas);
+procedure TTriangle.DrawFilled(scene: TSceneManager; canvas: TCanvas);
 var
   i: integer;
   texture: TTexture;
@@ -1126,7 +1134,7 @@ begin
   canvas.Polygon(pts);
 end;
 
-procedure TTriangle.DrawPolygon(scene: TSceneData; canvas: TCanvas; view: TView);
+procedure TTriangle.DrawPolygon(scene: TSceneManager; canvas: TCanvas; view: TView);
 var
   i: integer;
 
@@ -1461,7 +1469,7 @@ begin
   dlg.Free;
 end;
 
-procedure TShape.Make(scene: TSceneData; theTriangles: TList);
+procedure TShape.Make(scene: TSceneManager; theTriangles: TList);
 var
   i: integer;
   triangle: TTriangle;
@@ -1484,7 +1492,7 @@ begin
   end;
 end;
 
-procedure TShape.MakeInShape(scene: TSceneData; shape: TShape; theTriangles: TList);
+procedure TShape.MakeInShape(scene: TSceneManager; shape: TShape; theTriangles: TList);
 var
   i: integer;
   triangle: TTriangle;
@@ -1536,7 +1544,7 @@ begin
   result := IntersectRect(intersection, adjusted, canvas.ClipRect);
 end;
 
-procedure TShape.DrawTexture(Scene: TSceneData; canvas: TCanvas);
+procedure TShape.DrawTexture(Scene: TSceneManager; canvas: TCanvas);
 begin
   if texture <> nil then
     canvas.Pen.Color := texture.GetPaletteRGB
@@ -1544,7 +1552,7 @@ begin
     canvas.Pen.Color := clWhite;
 end;
 
-procedure TShape.DrawSelected(Scene: TSceneData; canvas: TCanvas);
+procedure TShape.DrawSelected(Scene: TSceneManager; canvas: TCanvas);
 begin
   if (Parent = nil) and (ssSelected in States) then
   begin
@@ -1560,7 +1568,7 @@ begin
   end;
 end;
 
-procedure TShape.Draw(Scene: TSceneData; theTriangles: TList;
+procedure TShape.Draw(Scene: TSceneManager; theTriangles: TList;
   canvas: TCanvas; Mode: TPenMode);
 var
   i: integer;
@@ -1603,7 +1611,7 @@ begin
   end;
 end;
 
-procedure TShape.SetTranslate(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TShape.SetTranslate(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
   if xb then Translate.X := x;
   if yb then Translate.Y := y;
@@ -1611,7 +1619,7 @@ begin
   Make(scene, Triangles);
 end;
 
-procedure TShape.SetTranslateAnchor(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TShape.SetTranslateAnchor(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
   if xb then Translate.X := Anchor.x + x;
   if yb then Translate.Y := Anchor.y + y;
@@ -1619,7 +1627,7 @@ begin
   Make(scene, Triangles);
 end;
 
-procedure TShape.SetScale(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TShape.SetScale(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
   if xb then Scale.X := x;
   if yb then Scale.Y := y;
@@ -1627,7 +1635,7 @@ begin
   Make(scene, Triangles);
 end;
 
-procedure TShape.SetScaleAnchor(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TShape.SetScaleAnchor(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
   if xb then Scale.X := abs(Anchor.x + x);
   if yb then Scale.Y := abs(Anchor.y + y);
@@ -1635,7 +1643,7 @@ begin
   Make(scene, Triangles);
 end;
 
-procedure TShape.SetUniformScaleAnchor(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TShape.SetUniformScaleAnchor(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
   case scene.View of
     vwFront, vwBack, vwTop, vwBottom:
@@ -1658,7 +1666,7 @@ begin
   Make(scene, Triangles);
 end;
 
-procedure TShape.SetRotate(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TShape.SetRotate(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
   if xb then Rotate.X := x;
   if yb then Rotate.Y := y;
@@ -1666,11 +1674,11 @@ begin
   Make(scene, Triangles);
 end;
 
-procedure TShape.SetObserver(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TShape.SetObserver(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
 end;
 
-procedure TShape.SetObserved(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TShape.SetObserved(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
 end;
 
@@ -2327,7 +2335,7 @@ begin
   result := Observed;
 end;
 
-procedure TCamera.SetObserver(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TCamera.SetObserver(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
   if xb then Observer.x := x;
   if yb then Observer.y := y;
@@ -2335,7 +2343,7 @@ begin
   Make(scene, Triangles);
 end;
 
-procedure TCamera.SetObserved(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TCamera.SetObserved(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
   if xb then Observed.x := x;
   if yb then Observed.y := y;
@@ -2343,7 +2351,7 @@ begin
   Make(scene, Triangles);
 end;
 
-procedure TCamera.Draw(Scene: TSceneData; theTriangles: TList; canvas: TCanvas; Mode: TPenMode);
+procedure TCamera.Draw(Scene: TSceneManager; theTriangles: TList; canvas: TCanvas; Mode: TPenMode);
 begin
   if Scene.GetView <> vwCamera then
   begin
@@ -2400,7 +2408,7 @@ begin
   Angle.z := 0.0;
 end;
 
-procedure TCamera.Make(scene: TSceneData; theTriangles: TList);
+procedure TCamera.Make(scene: TSceneManager; theTriangles: TList);
 begin
   inherited Make(scene, theTriangles);
 
@@ -2847,7 +2855,7 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 //  TSceneData
 
-constructor TSceneData.Create;
+constructor TSceneManager.Create;
 var
   layer: TLayer;
 
@@ -2865,18 +2873,18 @@ begin
   ScaleDiv := 1;
   Grid := 0;
 
-  ZBuffer := TObjectList.Create(false);
+  ZBuffer := TList<TTriangle>.Create;
   ZBuffer.Capacity := 1000;
 
   UndoIndex := -1;
-  UndoBuffer := TObjectList.Create;
+  UndoBuffer := TList<Tundo>.Create;
   UndoBuffer.Capacity := UndoLimit;
   UndoDrag := nil;
 
   ScriptFiles := TList.Create;
 
-  Shapes := TObjectList.Create;
-  Layers := TObjectList.Create;
+  Shapes := TList<TShape>.Create;
+  Layers := TList<TLayer>.Create;
   AtmosphereSettings := TAtmosphereSettings.Create;
   Fog := TFog.Create;
   AnchorPoint := TVector.Create;
@@ -2893,7 +2901,7 @@ begin
   Layers.Add(layer);
 end;
 
-function TSceneData.CreateShape(AType: TShapeType; const Name: string; x, y, z: double): TShape;
+function TSceneManager.CreateShape(AType: TShapeType; const Name: string; x, y, z: double): TShape;
 var
   shape: TShape;
   camera: TCamera;
@@ -2928,12 +2936,12 @@ begin
   result := shape;
 end;
 
-function TSceneData.IsModified: boolean;
+function TSceneManager.IsModified: boolean;
 begin
   result := Modified;
 end;
 
-function TSceneData.CountSelected: integer;
+function TSceneManager.CountSelected: integer;
 var
   i, n: integer;
   shape: TShape;
@@ -2950,17 +2958,17 @@ begin
   result := n;
 end;
 
-function TSceneData.HasMultipleSelected: boolean;
+function TSceneManager.HasMultipleSelected: boolean;
 begin
   result := CountSelected > 1;
 end;
 
-procedure TSceneData.SetModified;
+procedure TSceneManager.SetModified;
 begin
   Modified := True;
 end;
 
-procedure TSceneData.Empty;
+procedure TSceneManager.Empty;
 var
   layer: TLayer;
   
@@ -2987,7 +2995,7 @@ begin
   Modified := False;
 end;
 
-function TSceneData.UsingTexture(texture: TTexture): boolean;
+function TSceneManager.UsingTexture(texture: TTexture): boolean;
 var
   i: integer;
   shape: TShape;
@@ -3005,7 +3013,7 @@ begin
   end;
 end;
 
-procedure TSceneData.Make;
+procedure TSceneManager.Make;
 var
   i: integer;
   shape: TShape;
@@ -3026,7 +3034,7 @@ begin
   end;
 end;
 
-procedure TSceneData.Draw(canvas: TCanvas);
+procedure TSceneManager.Draw(canvas: TCanvas);
 var
   i: integer;
   shape: TShape;
@@ -3049,7 +3057,7 @@ begin
     end;
 end;
 
-procedure TSceneData.Print(canvas: TCanvas);
+procedure TSceneManager.Print(canvas: TCanvas);
 var
   i: integer;
   shape: TShape;
@@ -3072,13 +3080,13 @@ begin
     end;
 end;
 
-procedure TSceneData.SetView(AView: TView);
+procedure TSceneManager.SetView(AView: TView);
 begin
   View := AView;
   Make;
 end;
 
-procedure TSceneData.SetCurrent(shape: TShape);
+procedure TSceneManager.SetCurrent(shape: TShape);
 begin
   if Current <> nil then
     Current.States := Current.States - [ssSelected];
@@ -3089,7 +3097,7 @@ begin
     Current.States := Current.States + [ssSelected];
 end;
 
-procedure TSceneData.SetMultiple(shape: TShape);
+procedure TSceneManager.SetMultiple(shape: TShape);
 begin
   Current := shape;
 
@@ -3097,17 +3105,17 @@ begin
     Current.States := Current.States + [ssSelected];
 end;
 
-procedure TSceneData.SetCamera(camera: TCamera);
+procedure TSceneManager.SetCamera(camera: TCamera);
 begin
   CurrentCamera := camera;
 end;
 
-function TSceneData.GetCamera: TCamera;
+function TSceneManager.GetCamera: TCamera;
 begin
   result := CurrentCamera;
 end;
 
-procedure TSceneData.SetMode(AMode: TMode);
+procedure TSceneManager.SetMode(AMode: TMode);
 begin
   Mode := AMode;
 
@@ -3125,17 +3133,17 @@ begin
 {$ENDIF}
 end;
 
-function TSceneData.GetMode: TMode;
+function TSceneManager.GetMode: TMode;
 begin
   result := Mode;
 end;
 
-function TSceneData.GetView: TView;
+function TSceneManager.GetView: TView;
 begin
   result := View;
 end;
 
-procedure TSceneData.AdjustPoint(X, Y: integer;
+procedure TSceneManager.AdjustPoint(X, Y: integer;
   var point: TPoint;
   var xx, yy, zz: double;
   var xb, yb, zb: boolean);
@@ -3227,7 +3235,7 @@ begin
   end;
 end;
 
-procedure TSceneData.Anchor;
+procedure TSceneManager.Anchor;
 begin
   if current <> nil then
     AnchorPoint.Copy(current.Translate);
@@ -3244,7 +3252,7 @@ begin
   result := s;
 end;
 
-procedure TSceneData.MouseDown(Shift: TShiftState; X, Y: integer);
+procedure TSceneManager.MouseDown(Shift: TShiftState; X, Y: integer);
 var
   i: integer;
   SomethingSelected: boolean;
@@ -3448,7 +3456,7 @@ begin
   end;
 end;
 
-procedure TSceneData.CalculateSetRotation(xx, yy, zz: double);
+procedure TSceneManager.CalculateSetRotation(xx, yy, zz: double);
 var
   x, y, z: double;
 
@@ -3484,7 +3492,7 @@ begin
   end;
 end;
 
-procedure TSceneData.MouseMove(X, Y: integer);
+procedure TSceneManager.MouseMove(X, Y: integer);
 var
   Point: TPoint;
   xx, yy, zz: double;
@@ -3497,7 +3505,7 @@ begin
     FloatToStrF(yy, ffFixed, 3, 2) + ' ' + FloatToStrF(zz, ffFixed, 3, 2);
 end;
 
-function TSceneData.DragOver(x, y: integer): boolean;
+function TSceneManager.DragOver(x, y: integer): boolean;
 var
   Point: TPoint;
   xx, yy, zz: double;
@@ -3552,7 +3560,7 @@ begin
   end;
 end;
 
-procedure TSceneData.EndDrag;
+procedure TSceneManager.EndDrag;
 var
   vector: TVector;
 
@@ -3574,12 +3582,12 @@ begin
   UndoDrag := nil;
 end;
 
-function TSceneData.GetCurrent: TShape;
+function TSceneManager.GetCurrent: TShape;
 begin
   result := Current;
 end;
 
-procedure TSceneData.SetTexture(ATexture: TTexture);
+procedure TSceneManager.SetTexture(ATexture: TTexture);
 var
   i: integer;
   shape: TShape;
@@ -3597,64 +3605,64 @@ begin
   SetModified;
 end;
 
-procedure TSceneData.SetCreateWhat(AType: TShapeType);
+procedure TSceneManager.SetCreateWhat(AType: TShapeType);
 begin
   Mode := mdCreate;
   CreateWhat := AType;
 end;
 
-function TSceneData.GetCreateWhat: TShapeType;
+function TSceneManager.GetCreateWhat: TShapeType;
 begin
   result := CreateWhat;
 end;
 
-procedure TSceneData.SetGrid(value: double);
+procedure TSceneManager.SetGrid(value: double);
 begin
   Grid := value;
 end;
 
-function TSceneData.GetGrid: double;
+function TSceneManager.GetGrid: double;
 begin
   result := Grid;
 end;
 
-procedure TSceneData.SetScale(mult, divisor: integer);
+procedure TSceneManager.SetScale(mult, divisor: integer);
 begin
   ScaleMult := mult;
   ScaleDiv := divisor;
 end;
 
-procedure TSceneData.GetScale(var mult, divisor: integer);
+procedure TSceneManager.GetScale(var mult, divisor: integer);
 begin
   mult := ScaleMult;
   divisor := ScaleDiv;
 end;
 
-procedure TSceneData.ScaleUp;
+procedure TSceneManager.ScaleUp;
 begin
   inc(ScaleMult);
 end;
 
-procedure TSceneData.ScaleDown;
+procedure TSceneManager.ScaleDown;
 begin
   inc(ScaleDiv);
 end;
 
-procedure TSceneData.SetCreateSolid(AType: TSolidType);
+procedure TSceneManager.SetCreateSolid(AType: TSolidType);
 begin
   Mode := mdCreate;
   CreateWhat := TSolid;
   CreateWhatSolid := AType;
 end;
 
-procedure TSceneData.SetCreateScripted(AType: TShapeID);
+procedure TSceneManager.SetCreateScripted(AType: TShapeID);
 begin
   Mode := mdCreate;
   CreateWhat := TScripted;
   CreateWhatScripted := AType;
 end;
 
-procedure TSceneData.Save(const filename: string);
+procedure TSceneManager.Save(const filename: string);
 var
   i, n: integer;
   text: string;
@@ -3692,7 +3700,7 @@ begin
   end;
 end;
 
-procedure TSceneData.SaveToFile(const Name: string);
+procedure TSceneManager.SaveToFile(const Name: string);
 var
   i, n: integer;
   Shape: TShape;
@@ -3735,7 +3743,7 @@ begin
   end;
 end;
 
-function TSceneData.LoadShape(source: TStream): TShape;
+function TSceneManager.LoadShape(source: TStream): TShape;
 var
   ID: TShapeID;
   Shape: TShape;
@@ -3752,7 +3760,7 @@ begin
   end;
 end;
 
-procedure TSceneData.LoadFromFile(const Name: string);
+procedure TSceneManager.LoadFromFile(const Name: string);
 var
   i, n: integer;
   shape: TShape;
@@ -3810,7 +3818,7 @@ begin
   end;
 end;
 
-procedure TSceneData.GenerateV30(const Name: string);
+procedure TSceneManager.GenerateV30(const Name: string);
 var
   OldDecSep: char;
   i: integer;
@@ -3856,7 +3864,7 @@ begin
   end;
 end;
 
-procedure TSceneData.GenerateCoolRay(const Name: string);
+procedure TSceneManager.GenerateCoolRay(const Name: string);
 var
   OldDecSep: char;
   i, index: integer;
@@ -3907,7 +3915,7 @@ begin
   end;
 end;
 
-procedure TSceneData.GenerateVRML(const Name: string);
+procedure TSceneManager.GenerateVRML(const Name: string);
 var
   OldDecSep: char;
   i: integer;
@@ -3952,7 +3960,7 @@ begin
   end;
 end;
 
-procedure TSceneData.GenerateVRML2(const Name: string);
+procedure TSceneManager.GenerateVRML2(const Name: string);
 var
   OldDecSep: char;
   i: integer;
@@ -3997,7 +4005,7 @@ begin
   end;
 end;
 
-procedure TSceneData.GenerateUDO(const Name: string);
+procedure TSceneManager.GenerateUDO(const Name: string);
 var
   i: integer;
   dest: TextFile;
@@ -4040,7 +4048,7 @@ begin
   end;
 end;
 
-procedure TSceneData.GenerateDirectX(const Name: string; const Options: TExportOptions);
+procedure TSceneManager.GenerateDirectX(const Name: string; const Options: TExportOptions);
 {const
     TOKEN_NAME = 1;
     TOKEN_STRING = 2;
@@ -4157,14 +4165,14 @@ begin
     end;
 end;
 
-procedure TSceneData.DeleteShape(shape: TShape);
+procedure TSceneManager.DeleteShape(shape: TShape);
 begin
   SetModified;
   Shapes.Extract(shape);
   AddUndo(utDeleteShape, shape, nil, nil);
 end;
 
-procedure TSceneData.DeleteSelected;
+procedure TSceneManager.DeleteSelected;
 var
   i: integer;
   shape: TShape;
@@ -4183,7 +4191,7 @@ begin
   end;
 end;
 
-function TSceneData.Delete: boolean;
+function TSceneManager.Delete: boolean;
 begin
   result := False;
   if CountSelected > 0 then
@@ -4198,7 +4206,7 @@ begin
   end;
 end;
 
-function TSceneData.CutSelected: boolean;
+function TSceneManager.CutSelected: boolean;
 begin
   result := False;
   if Current <> nil then
@@ -4211,7 +4219,7 @@ begin
   end;
 end;
 
-procedure TSceneData.CopySelected;
+procedure TSceneManager.CopySelected;
 var
   i, n: integer;
   shape: TShape;
@@ -4262,7 +4270,7 @@ begin
   end;
 end;
 
-procedure TSceneData.Paste(multiple: boolean);
+procedure TSceneManager.Paste(multiple: boolean);
 var
   i, n, j, count: integer;
   shape, shape2: TShape;
@@ -4391,7 +4399,7 @@ begin
   end;
 end;
 
-procedure TSceneData.ImportRAW(const Name: string);
+procedure TSceneManager.ImportRAW(const Name: string);
 var
   i, size: integer;
   source: TextFile;
@@ -4502,7 +4510,7 @@ begin
   end;
 end;
 
-procedure TSceneData.CreateGroup(AType: TGroupType);
+procedure TSceneManager.CreateGroup(AType: TGroupType);
 var
   i: integer;
   shape: TShape;
@@ -4538,7 +4546,7 @@ begin
   end;
 end;
 
-procedure TSceneData.CreateBlob;
+procedure TSceneManager.CreateBlob;
 var
   i: integer;
   shape: TShape;
@@ -4573,7 +4581,7 @@ begin
   end;
 end;
 
-function TSceneData.CreateGallery: TShape;
+function TSceneManager.CreateGallery: TShape;
 var
   i: integer;
   shape: TShape;
@@ -4615,7 +4623,7 @@ begin
   end
 end;
 
-procedure TSceneData.SelectAll;
+procedure TSceneManager.SelectAll;
 var
   i: integer;
   shape: TShape;
@@ -4628,7 +4636,7 @@ begin
   end;
 end;
 
-procedure TSceneData.Clear;
+procedure TSceneManager.Clear;
 var
   i: integer;
   shape: TShape;
@@ -4641,65 +4649,43 @@ begin
   end;
 end;
 
-function TSceneData.GetHiddenLineRemoval: boolean;
+function TSceneManager.GetHiddenLineRemoval: boolean;
 begin
   result := HiddenLineRemoval;
 end;
 
-function TSceneData.ToggleHiddenLineRemoval: boolean;
+function TSceneManager.ToggleHiddenLineRemoval: boolean;
 begin
   HiddenLineRemoval := not HiddenLineRemoval;
   Make;
   result := HiddenLineRemoval;
 end;
 
-function TSceneData.GetLightShading: boolean;
+function TSceneManager.GetLightShading: boolean;
 begin
   result := LightShading;
 end;
 
-function TSceneData.ToggleLightShading: boolean;
+function TSceneManager.ToggleLightShading: boolean;
 begin
   LightShading := not LightShading;
   Make;
   result := LightShading;
 end;
 
-function TSceneData.ToggleOutline: boolean;
+function TSceneManager.ToggleOutline: boolean;
 begin
   Outline := not Outline;
   Make;
   result := Outline;
 end;
 
-function TSceneData.GetOutline: boolean;
+function TSceneManager.GetOutline: boolean;
 begin
   result := Outline;
 end;
 
-function CompareTriangleCenters(p1, p2: Pointer): integer;
-var
-  t1, t2: TTriangle;
-
-begin
-  t1 := p1;
-  t2 := p2;
-
-  {if abs(t1.Center.z - t2.Center.z) < 0.001 then
-    result := 0
-  else if t1.Center.z < t2.Center.z then
-    result := -1
-  else
-    result := 1;}
-  if abs(t1.Distance - t2.Distance) < 0.001 then
-    result := 0
-  else if t1.Distance < t2.Distance then
-    result := -1
-  else
-    result := 1;
-end;
-
-procedure TSceneData.CalculateZBuffer(list: TList);
+procedure TSceneManager.CalculateZBuffer(list: TList<TTriangle>);
 var
   i, j: integer;
   shape: TShape;
@@ -4731,10 +4717,10 @@ begin
     end;
   end;
 
-  list.Sort(CompareTriangleCenters);
+  list.Sort(TTriangleComparer.Create);
 end;
 
-function TSceneData.CanUndo: boolean;
+function TSceneManager.CanUndo: boolean;
 begin
   if UndoBuffer.Count > 0 then
   begin
@@ -4747,12 +4733,12 @@ begin
     result := False;
 end;
 
-function TSceneData.CanRedo: boolean;
+function TSceneManager.CanRedo: boolean;
 begin
   result := UndoIndex <> -1;
 end;
 
-function TSceneData.Undo: boolean;
+function TSceneManager.Undo: boolean;
 var
   index: integer;
   undo: TUndo;
@@ -4858,7 +4844,7 @@ begin
   end;
 end;
 
-function TSceneData.AddUndo(AType: TUndoType; AShape: TShape; APrev, ADetail: Pointer): TUndo;
+function TSceneManager.AddUndo(AType: TUndoType; AShape: TShape; APrev, ADetail: Pointer): TUndo;
 var
   undo: TUndo;
 
@@ -4874,7 +4860,7 @@ begin
   result := undo;
 end;
 
-function TSceneData.FindCamera(const name: string): TCamera;
+function TSceneManager.FindCamera(const name: string): TCamera;
 var
   i: integer;
   shape: TShape;
@@ -4893,7 +4879,7 @@ begin
   end;
 end;
 
-function TSceneData.FindLayer(const name: string): TLayer;
+function TSceneManager.FindLayer(const name: string): TLayer;
 var
   i: integer;
   layer: TLayer;
@@ -4912,17 +4898,17 @@ begin
   end;
 end;
 
-function TSceneData.GetUniformScaling: boolean;
+function TSceneManager.GetUniformScaling: boolean;
 begin
   result := UniformScaling;
 end;
 
-procedure TSceneData.SetUniformScaling(scaling: boolean);
+procedure TSceneManager.SetUniformScaling(scaling: boolean);
 begin
   UniformScaling := scaling;
 end;
 
-function TSceneData.CheckShapeTexture: boolean;
+function TSceneManager.CheckShapeTexture: boolean;
 var
   i: integer;
   shape: TShape;
@@ -4941,17 +4927,17 @@ begin
   end;
 end;
 
-procedure TSceneData.SetCurrentLayer(layer: TLayer);
+procedure TSceneManager.SetCurrentLayer(layer: TLayer);
 begin
   CurrentLayer := layer;
 end;
 
-function TSceneData.GetCurrentLayer: TLayer;
+function TSceneManager.GetCurrentLayer: TLayer;
 begin
   result := CurrentLayer;
 end;
 
-destructor TSceneData.Destroy;
+destructor TSceneManager.Destroy;
 begin
   AnchorPoint.Free;
   AtmosphereSettings.Free;
@@ -4965,7 +4951,7 @@ begin
   inherited;
 end;
 
-function TSceneData.FindScriptFile(const name: string): TScriptFile;
+function TSceneManager.FindScriptFile(const name: string): TScriptFile;
 var
   i: integer;
 
@@ -4996,7 +4982,7 @@ begin
   end;
 end;
 
-procedure TSceneData.NextFrame;
+procedure TSceneManager.NextFrame;
 begin
   inc(AnimationPosition);
 
@@ -5007,7 +4993,7 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 //
 
-function CreateShapeFromID(ID: TShapeID): TShape;
+class function TSceneManager.CreateShapeFromID(ID: TShapeID): TShape;
 begin
   case ID of
     siCamera:         result := TCamera.Create;
@@ -5040,6 +5026,24 @@ begin
   else
     raise ELoadShapeError.Create('Invalid shape id [' + IntToStr(ord(ID)) + '] encountered');
   end;
+end;
+
+{ TTriangleComparer }
+
+function TTriangleComparer.Compare(const t1, t2: TTriangle): Integer;
+begin
+  {if abs(t1.Center.z - t2.Center.z) < 0.001 then
+    result := 0
+  else if t1.Center.z < t2.Center.z then
+    result := -1
+  else
+    result := 1;}
+  if abs(t1.Distance - t2.Distance) < 0.001 then
+    result := 0
+  else if t1.Distance < t2.Distance then
+    result := -1
+  else
+    result := 1;
 end;
 
 end.

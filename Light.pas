@@ -65,10 +65,10 @@ type
       constructor Create; override;
       destructor Destroy; override;
       function GetID: TShapeID; override;
-      procedure Draw(Scene: TSceneData; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); override;
-      procedure Make(scene: TSceneData; theTriangles: TList); override;
+      procedure Draw(Scene: TSceneManager; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); override;
+      procedure Make(scene: TSceneManager; theTriangles: TList); override;
       function GetObserved: TVector; override;
-      procedure SetObserved(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean); override;
+      procedure SetObserved(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean); override;
       procedure GenerateLight(var dest: TextFile); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
@@ -355,7 +355,7 @@ begin
   result := PointAt;
 end;
 
-procedure TSpotLight.SetObserved(scene: TSceneData; x, y, z: double; xb, yb, zb: boolean);
+procedure TSpotLight.SetObserved(scene: TSceneManager; x, y, z: double; xb, yb, zb: boolean);
 begin
   if xb then PointAt.X := x - Translate.x;
   if yb then PointAt.Y := y - Translate.y;
@@ -363,7 +363,7 @@ begin
   Make(scene, Triangles);
 end;
 
-procedure TSpotLight.Draw(Scene: TSceneData; theTriangles: TList; canvas: TCanvas; Mode: TPenMode);
+procedure TSpotLight.Draw(Scene: TSceneManager; theTriangles: TList; canvas: TCanvas; Mode: TPenMode);
 begin
   canvas.Pen.Mode := Mode;
 
@@ -384,7 +384,7 @@ begin
   inherited Draw(Scene, theTriangles, canvas, Mode);
 end;
 
-procedure TSpotLight.Make(scene: TSceneData; theTriangles: TList);
+procedure TSpotLight.Make(scene: TSceneManager; theTriangles: TList);
 begin
   inherited Make(scene, theTriangles);
 

@@ -38,7 +38,7 @@ resourcestring
 const
   // 14 - removed SMPL support
   // 15 - switch to sets for various flags
-  ModelVersion  = 15;
+  ModelVersion  = 16;
 
   crTranslate   = 1;
   crScale       = 2;
@@ -458,7 +458,7 @@ type
     Halos: TList<THalo>;
     TextureManager: TTextureManager;
     ObjectGallery: TList<TShape>;
-    SceneData: TSceneData;
+    SceneData: TSceneManager;
 
     procedure CenterView;
     procedure SetCurrent;
@@ -769,7 +769,7 @@ begin
 
   ObjectGallery := TList<TShape>.Create;
 
-  SceneData := TSceneData.Create;
+  SceneData := TSceneManager.Create;
 
   // Load halos (if they exist)
   if FileExists('Halos.mhf') then

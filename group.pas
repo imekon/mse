@@ -46,8 +46,8 @@ type
     constructor Create; override;
     destructor Destroy; override;
     function GetID: TShapeID; override;
-    procedure Make(scene: TSceneData; theTriangles: TList); override;
-    procedure Draw(Scene: TSceneData; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); override;
+    procedure Make(scene: TSceneManager; theTriangles: TList); override;
+    procedure Draw(Scene: TSceneManager; theTriangles: TList; canvas: TCanvas; Mode: TPenMode); override;
     procedure Generate(var dest: TextFile); override;
     procedure AddShape(shape: TShape);
     procedure RemoveShape(shape: TShape);
@@ -157,7 +157,7 @@ begin
 end;
 *}
 
-procedure TGroupShape.Make(scene: TSceneData; theTriangles: TList);
+procedure TGroupShape.Make(scene: TSceneManager; theTriangles: TList);
 var
   i: integer;
   shape: TShape;
@@ -256,7 +256,7 @@ begin
   for i := 1 to n do
   begin
     source.ReadBuffer(ID, sizeof(ID));
-    shape := CreateShapeFromID(ID);
+    shape := TSceneManager.CreateShapeFromID(ID);
     assert(shape <> nil);
     if shape <> nil then
     begin
@@ -267,7 +267,7 @@ begin
   end;
 end;
 
-procedure TGroupShape.Draw(Scene: TSceneData; theTriangles: TList; canvas: TCanvas; Mode: TPenMode);
+procedure TGroupShape.Draw(Scene: TSceneManager; theTriangles: TList; canvas: TCanvas; Mode: TPenMode);
 var
   i: integer;
   shape: TShape;
@@ -356,7 +356,7 @@ begin
   for i := 0 to group.Shapes.Count - 1 do
   begin
     shape := group.Shapes[i] as TShape;
-    shape2 := CreateShapeFromID(shape.GetID);
+    shape2 := TSceneManager.CreateShapeFromID(shape.GetID);
     shape2.Copy(shape);
     AddShape(shape2);
   end;
@@ -442,7 +442,7 @@ begin
   for i := 0 to group.Shapes.Count - 1 do
   begin
     shape := group.Shapes[i] as TShape;
-    shape2 := CreateShapeFromID(shape.GetID);
+    shape2 := TSceneManager.CreateShapeFromID(shape.GetID);
     shape2.Copy(shape);
     AddShape(shape2);
   end;
