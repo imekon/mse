@@ -58,7 +58,7 @@ var
 
 begin
   TreeView.Items.Clear;
-  with MainForm.SceneData do
+  with MainForm.SceneManager do
     for i := 0 to Shapes.Count - 1 do
     begin
       shape := Shapes[i] as TShape;
@@ -99,9 +99,9 @@ begin
       camera := TCamera(Selected.Data);
       if camera is TCamera then
       begin
-        MainForm.SceneData.SetCamera(camera);
-        if MainForm.SceneData.GetView = vwCamera then
-          MainForm.SceneData.Make;
+        MainForm.SceneManager.SetCamera(camera);
+        if MainForm.SceneManager.GetView = vwCamera then
+          MainForm.SceneManager.Make;
       end;
     end;
 end;
@@ -115,8 +115,8 @@ begin
     if Selected <> nil then
     begin
       shape := TShape(Selected.Data);
-      MainForm.SceneData.SetCurrent(shape);
-      MainForm.SceneData.Make;
+      MainForm.SceneManager.SetCurrent(shape);
+      MainForm.SceneManager.Make;
       MainForm.MainPaintBox.Refresh;
     end;
 end;

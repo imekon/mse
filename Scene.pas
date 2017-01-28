@@ -94,7 +94,7 @@ type
   TExportOptions = class;
 
   // Basic triangle
-  TTriangle = class(TObject)
+  TTriangle = class
     public
       Points: array [1..3] of TCoord;
       Cull: boolean;        // Indicate this triangle should be culled
@@ -157,7 +157,7 @@ type
   TGroupType = (gtUnion, gtIntersection, gtDifference, gtBlob, gtMerge,
     gtGallery);
 
-  TExtendedPoint = class(TObject)
+  TExtendedPoint = class
   private
     line: boolean;
     point: TPoint;
@@ -185,7 +185,7 @@ type
   //  TShape
   //////////////////////////////////////////////////////////////////////////////
 
-  TShape = class(TObject)
+  TShape = class
     public
       Name: AnsiString;
       Features: TShapeFeatures;           { Fixed features }
@@ -237,6 +237,7 @@ type
       procedure ResetTriangleSelection;
       procedure Save(parent: TJSONArray); virtual;
       procedure SaveToFile(dest: TStream); virtual;
+      procedure Load(obj: TJSONObject); virtual;
       procedure LoadFromFile(source: TStream); virtual;
       procedure GenerateDetails(var dest: TextFile); virtual;
       procedure Generate(var dest: TextFile); virtual;
@@ -282,6 +283,7 @@ type
     procedure Make(scene: TSceneManager; theTriangles: TList); override;
     procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
+    procedure Load(obj: TJSONObject); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
     procedure GenerateVRML(var dest: TextFile); override;
@@ -425,7 +427,7 @@ type
     UndoIndex: integer;
     UndoBuffer: TList<TUndo>;
 
-    ScriptFiles: TList;       // Cache of script files
+    ScriptFiles: TList<TScriptFile>;       // Cache of script files
 
     procedure AdjustPoint(X, Y: integer;
       var point: TPoint;
@@ -438,8 +440,8 @@ type
   public
     { Public declarations }
     FileVersion: integer;
-    Shapes: TList<TShape>;
-    Layers: TList<TLayer>;
+    Shapes: TObjectList<TShape>;
+    Layers: TObjectList<TLayer>;
     CreateExtrusion: boolean;
     AnimationPosition: Cardinal;
 
@@ -492,7 +494,9 @@ type
 
     procedure Save(const filename: string);
     procedure SaveToFile(const Name: string);
-    function LoadShape(source: TStream): TShape;
+    function LoadShape(obj: TJSONObject): TShape; overload;
+    function LoadShape(source: TStream): TShape; overload;
+    procedure Load(obj: TJSONObject);
     procedure LoadFromFile(const Name: string);
     procedure GenerateV30(const Name: string);
     procedure GenerateCoolRay(const Name: string);
@@ -1782,6 +1786,21 @@ begin
   //Rotate.SaveToFile(dest);
 end;
 
+procedure TShape.Load(obj: TJSONObject);
+var
+  b: byte;
+  s: string;
+
+begin
+  Name := obj.GetValue('name').Value;
+  b := StrToInt(obj.GetValue('flags').Value);
+  Flags := TShapeFlags(b);
+  s := obj.GetValue('texture').Value;
+  Texture := MainForm.FindTexture(s);
+  s := obj.GetValue('layer').Value;
+  Layer := MainForm.SceneManager.FindLayer(s);
+end;
+
 procedure TShape.LoadFromFile(source: TStream);
 var
   flag: boolean;
@@ -1792,7 +1811,7 @@ begin
   LoadStringFromStream(Name, source);
 
   // Load shadow flag
-  if MainForm.SceneData.FileVersion < 15 then
+  if MainForm.SceneManager.FileVersion < 15 then
   begin
     source.ReadBuffer(flag, sizeof(flag));
     if flag then
@@ -1801,7 +1820,7 @@ begin
       Flags := Flags - [sfShadow];
 
     // Load Hollow flag
-    if MainForm.SceneData.FileVersion > 7 then
+    if MainForm.SceneManager.FileVersion > 7 then
     begin
       source.ReadBuffer(flag, sizeof(flag));
 
@@ -1819,10 +1838,10 @@ begin
   Texture := MainForm.FindTexture(buffer);
 
   // Load layer
-  if MainForm.SceneData.FileVersion > 10 then
+  if MainForm.SceneManager.FileVersion > 10 then
   begin
     LoadStringFromStream(buffer, source);
-    Layer := MainForm.SceneData.FindLayer(buffer);
+    Layer := MainForm.SceneManager.FindLayer(buffer);
   end;
 
   // Load properties
@@ -1831,7 +1850,7 @@ begin
   //Rotate.LoadFromFile(source);
 
   // Load SMPL details
-  if (MainForm.SceneData.FileVersion > 8) and (MainForm.SceneData.FileVersion < 14) then
+  if (MainForm.SceneManager.FileVersion > 8) and (MainForm.SceneManager.FileVersion < 14) then
     LoadStringFromStream(dummy, source);
 end;
 
@@ -2453,6 +2472,11 @@ begin
   //Observed.SaveToFile(dest);
 end;
 
+procedure TCamera.Load(obj: TJSONObject);
+begin
+  Name := obj.GetValue('name').Value;
+end;
+
 procedure TCamera.LoadFromFile(source: TStream);
 begin
   // Load name
@@ -2561,10 +2585,10 @@ begin
     Observed.y := StrToFloat(dlg.YObserved.Text);
     Observed.z := StrToFloat(dlg.ZObserved.Text);
 
-    Make(MainForm.SceneData, Triangles);
+    Make(MainForm.SceneManager, Triangles);
 
-    if MainForm.SceneData.GetView = vwCamera then
-      MainForm.SceneData.Make;
+    if MainForm.SceneManager.GetView = vwCamera then
+      MainForm.SceneManager.Make;
 
     MainForm.MainPaintBox.Refresh;
   end;
@@ -2881,10 +2905,10 @@ begin
   UndoBuffer.Capacity := UndoLimit;
   UndoDrag := nil;
 
-  ScriptFiles := TList.Create;
+  ScriptFiles := TList<TScriptFile>.Create;
 
-  Shapes := TList<TShape>.Create;
-  Layers := TList<TLayer>.Create;
+  Shapes := TObjectList<TShape>.Create;
+  Layers := TObjectList<TLayer>.Create;
   AtmosphereSettings := TAtmosphereSettings.Create;
   Fog := TFog.Create;
   AnchorPoint := TVector.Create;
@@ -3743,6 +3767,24 @@ begin
   end;
 end;
 
+function TSceneManager.LoadShape(obj: TJSONObject): TShape;
+var
+  ID: TShapeID;
+  Shape: TShape;
+  s: string;
+
+begin
+  result := nil;
+  s := obj.GetValue('id').Value;
+  ID := TShapeID(StrToInt(s));
+  shape := CreateShapeFromID(ID);
+  if shape <> nil then
+  begin
+    shape.Load(obj);
+    result := shape;
+  end;
+end;
+
 function TSceneManager.LoadShape(source: TStream): TShape;
 var
   ID: TShapeID;
@@ -3757,6 +3799,36 @@ begin
     shape.LoadFromFile(source);
     Shapes.Add(shape);
     result := shape;
+  end;
+end;
+
+procedure TSceneManager.Load(obj: TJSONObject);
+var
+  i, n: integer;
+  shape: TShape;
+  shapesArray: TJSONArray;
+  child: TJSONObject;
+
+begin
+  Screen.Cursor := crHourglass;
+  try
+    Empty;
+    shapesArray := obj.GetValue('shapes') as TJSONArray;
+    n := shapesArray.Count;
+    for i := 0 to n - 1 do
+    begin
+      child := shapesArray.Items[i] as TJSONObject;
+      shape := LoadShape(child);
+      if shape is TCamera then
+        SetCamera(shape as TCamera);
+      Shapes.Add(shape);
+    end;
+
+    Make;
+
+    Modified := false;
+  finally
+    Screen.Cursor := crDefault;
   end;
 end;
 
@@ -4973,11 +5045,8 @@ begin
   if (result = nil) and FileExists(name) then
   begin
     script := TScriptFile.Create;
-
     script.Load(name);
-
     ScriptFiles.Add(script);
-
     result := script;
   end;
 end;

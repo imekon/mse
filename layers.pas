@@ -65,7 +65,7 @@ begin
   CurrentLayer.Items.Clear;
   ListView.Items.Clear;
 
-  with MainForm.SceneData do
+  with MainForm.SceneManager do
   begin
     for i := 0 to Layers.Count - 1 do
     begin
@@ -102,7 +102,7 @@ begin
   begin
     layer := CurrentLayer.Items.Objects[CurrentLayer.ItemIndex] as TLayer;
 
-    MainForm.SceneData.SetCurrentLayer(layer);
+    MainForm.SceneManager.SetCurrentLayer(layer);
   end;
 end;
 

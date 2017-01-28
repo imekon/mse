@@ -259,7 +259,7 @@ begin
   source.ReadBuffer(FadeDistance, sizeof(FadeDistance));
   source.ReadBuffer(FadePower, sizeof(FadePower));
   source.ReadBuffer(AtmosphericAttenuation, sizeof(AtmosphericAttenuation));
-  if MainForm.SceneData.FileVersion > 7 then
+  if MainForm.SceneManager.FileVersion > 7 then
   begin
     source.ReadBuffer(LooksLike, sizeof(LooksLike));
     source.ReadBuffer(Shadowless, sizeof(Shadowless));

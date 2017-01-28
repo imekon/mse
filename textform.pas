@@ -858,7 +858,7 @@ begin
     GetNormalSheet;
     GetFinishSheet;
 
-    MainForm.SceneData.SetModified;
+    MainForm.SceneManager.SetModified;
   end;
 
   Dirty := false;

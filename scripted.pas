@@ -389,7 +389,7 @@ begin
 
   LoadStringFromStream(FScriptFile, source);
 
-  MainForm.SceneData.FindScriptFile(FScriptFile);
+  MainForm.SceneManager.FindScriptFile(FScriptFile);
 
   source.Read(n, sizeof(n));
 

@@ -138,14 +138,14 @@ begin
       template := TGroupShape(Selected.Data);
 
       gallery := TGalleryShape.Create;
-      gallery.Name := template.Name + IntToStr(MainForm.SceneData.Shapes.Count);
+      gallery.Name := template.Name + IntToStr(MainForm.SceneManager.Shapes.Count);
       gallery.BasedOn := template;
       gallery.Build;
       with MainForm do
       begin
-        SceneData.Shapes.Add(gallery);
-        gallery.Make(SceneData, gallery.Triangles);
-        SceneData.SetModified;
+        SceneManager.Shapes.Add(gallery);
+        gallery.Make(SceneManager, gallery.Triangles);
+        SceneManager.SetModified;
         MainPaintBox.Refresh;
       end;
     end;
@@ -174,14 +174,14 @@ begin
     template := TGroupShape(ListView.Selected.Data);
 
     gallery := TGalleryShape.Create;
-    gallery.Name := template.Name + IntToStr(MainForm.SceneData.Shapes.Count);
+    gallery.Name := template.Name + IntToStr(MainForm.SceneManager.Shapes.Count);
     gallery.BasedOn := template;
     gallery.Build;
     with MainForm do
     begin
-      SceneData.Shapes.Add(gallery);
-      gallery.Make(SceneData, gallery.Triangles);
-      SceneData.SetModified;
+      SceneManager.Shapes.Add(gallery);
+      gallery.Make(SceneManager, gallery.Triangles);
+      SceneManager.SetModified;
       MainPaintBox.Refresh;
     end;
   end;

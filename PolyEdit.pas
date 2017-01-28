@@ -336,7 +336,7 @@ end;
 procedure TPolyEditor.CloseBtnClick(Sender: TObject);
 begin
   Polygon.SmoothShaded := SmoothShaded.Checked;
-  Polygon.Make(MainForm.SceneData, Polygon.Triangles);
+  Polygon.Make(MainForm.SceneManager, Polygon.Triangles);
   MainForm.MainPaintBox.Refresh;
   Close;
 end;

@@ -191,7 +191,7 @@ begin
 
   Shapes.Add(shape);
 
-  Make(MainForm.SceneData, Triangles);
+  Make(MainForm.SceneManager, Triangles);
 end;
 
 procedure TGroupShape.RemoveShape(shape: TShape);
@@ -200,7 +200,7 @@ begin
 
   Shapes.Extract(shape);
 
-  Make(MainForm.SceneData, Triangles);
+  Make(MainForm.SceneManager, Triangles);
 end;
 
 procedure TGroupShape.Save(parent: TJSONArray);

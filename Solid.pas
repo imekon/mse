@@ -220,7 +220,7 @@ var
 begin
   inherited LoadFromFile(source);
 
-  if MainForm.SceneData.FileVersion > 7 then
+  if MainForm.SceneManager.FileVersion > 7 then
   begin
     source.ReadBuffer(Open, sizeof(Open));
     source.ReadBuffer(UseSOR, sizeof(UseSOR));
