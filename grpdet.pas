@@ -84,7 +84,7 @@ begin
     end;
   end;
 
-  with MainForm.SceneManager do
+  with TSceneManager.SceneManager do
     for i := 0 to Shapes.Count - 1 do
     begin
       shape := Shapes[i] as TShape;
@@ -145,7 +145,7 @@ begin
       shape := SrcList.Items.Objects[i] as TShape;
 
       // Remove the shape from the main list
-      MainForm.SceneManager.Shapes.Extract(shape);
+      TSceneManager.SceneManager.Shapes.Extract(shape);
 
       // Add shape to group
       Group.AddShape(shape);
@@ -157,11 +157,11 @@ begin
 
   RemoveSelected(SrcList);
 
-  with MainForm do
+  with TSceneManager do
   begin
     SceneManager.SetModified;
     SceneManager.Make;
-    Refresh;
+    MainForm.Refresh;
   end;
 end;
 
@@ -184,7 +184,7 @@ begin
         Group.RemoveShape(shape);
 
         // Add shape to group
-        MainForm.SceneManager.Shapes.Add(shape);
+        TSceneManager.SceneManager.Shapes.Add(shape);
 
         // Add to list
         SrcList.Items.AddObject(DstList.Items[i], shape);
@@ -193,11 +193,11 @@ begin
 
     RemoveSelected(DstList);
 
-    with MainForm do
+    with TSceneManager do
     begin
       SceneManager.SetModified;
       SceneManager.Make;
-      Refresh;
+      MainForm.Refresh;
     end;
   end
   else

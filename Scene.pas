@@ -27,7 +27,8 @@ uses
   Winapi.Windows, Winapi.Messages,
   VCL.Graphics,
   VCL.Controls, VCL.Forms, VCL.Dialogs,
-  VCL.ComCtrls, VCL.Clipbrd, Vector, Texture, Matrix;
+  VCL.ComCtrls, VCL.Clipbrd,
+  Vector, Texture.Manager, Texture, Matrix;
 
 const
   d2r = pi / 180.0;
@@ -394,7 +395,7 @@ type
 
 
   //////////////////////////////////////////////////////////////////////////////
-  //  TSceneData
+  //  TSceneManager
   //////////////////////////////////////////////////////////////////////////////
 
   TSceneManager = class
@@ -439,6 +440,7 @@ type
     procedure CalculateZBuffer(list: TList<TTriangle>);
   public
     { Public declarations }
+    class var SceneManager: TSceneManager;
     FileVersion: integer;
     Shapes: TObjectList<TShape>;
     Layers: TObjectList<TLayer>;
@@ -1798,7 +1800,7 @@ begin
   s := obj.GetValue('texture').Value;
   Texture := MainForm.FindTexture(s);
   s := obj.GetValue('layer').Value;
-  Layer := MainForm.SceneManager.FindLayer(s);
+  Layer := TSceneManager.SceneManager.FindLayer(s);
 end;
 
 procedure TShape.LoadFromFile(source: TStream);
@@ -1811,7 +1813,7 @@ begin
   LoadStringFromStream(Name, source);
 
   // Load shadow flag
-  if MainForm.SceneManager.FileVersion < 15 then
+  if TSceneManager.SceneManager.FileVersion < 15 then
   begin
     source.ReadBuffer(flag, sizeof(flag));
     if flag then
@@ -1820,7 +1822,7 @@ begin
       Flags := Flags - [sfShadow];
 
     // Load Hollow flag
-    if MainForm.SceneManager.FileVersion > 7 then
+    if TSceneManager.SceneManager.FileVersion > 7 then
     begin
       source.ReadBuffer(flag, sizeof(flag));
 
@@ -1838,10 +1840,10 @@ begin
   Texture := MainForm.FindTexture(buffer);
 
   // Load layer
-  if MainForm.SceneManager.FileVersion > 10 then
+  if TSceneManager.SceneManager.FileVersion > 10 then
   begin
     LoadStringFromStream(buffer, source);
-    Layer := MainForm.SceneManager.FindLayer(buffer);
+    Layer := TSceneManager.SceneManager.FindLayer(buffer);
   end;
 
   // Load properties
@@ -1850,7 +1852,7 @@ begin
   //Rotate.LoadFromFile(source);
 
   // Load SMPL details
-  if (MainForm.SceneManager.FileVersion > 8) and (MainForm.SceneManager.FileVersion < 14) then
+  if (TSceneManager.SceneManager.FileVersion > 8) and (TSceneManager.SceneManager.FileVersion < 14) then
     LoadStringFromStream(dummy, source);
 end;
 
@@ -2585,10 +2587,10 @@ begin
     Observed.y := StrToFloat(dlg.YObserved.Text);
     Observed.z := StrToFloat(dlg.ZObserved.Text);
 
-    Make(MainForm.SceneManager, Triangles);
+    Make(TSceneManager.SceneManager, Triangles);
 
-    if MainForm.SceneManager.GetView = vwCamera then
-      MainForm.SceneManager.Make;
+    if TSceneManager.SceneManager.GetView = vwCamera then
+      TSceneManager.SceneManager.Make;
 
     MainForm.MainPaintBox.Refresh;
   end;
@@ -3913,9 +3915,9 @@ begin
     WriteLn(dest, '// Textures...');
     WriteLn(dest);
 
-    for i := 0 to MainForm.TextureManager.Textures.Count - 1 do
+    for i := 0 to TTextureManager.TextureManager.Textures.Count - 1 do
     begin
-      texture := MainForm.TextureManager.Textures[i];
+      texture := TTextureManager.TextureManager.Textures[i];
       if UsingTexture(texture) then
         texture.Generate(dest);
     end;
@@ -5114,5 +5116,12 @@ begin
   else
     result := 1;
 end;
+
+initialization
+  TSceneManager.SceneManager := TSceneManager.Create;
+
+finalization
+  TSceneManager.SceneManager.Free;
+  TSceneManager.SceneManager := nil;
 
 end.

@@ -12,6 +12,7 @@ type
     _textures: TList<TTexture>;
     modified: boolean;
   public
+    class var TextureManager: TTextureManager;
     constructor Create;
     destructor Destroy; override;
 
@@ -200,5 +201,12 @@ begin
 
   Modified := False;
 end;
+
+initialization
+  TTextureManager.TextureManager := TTextureManager.Create;
+
+finalization
+  TTextureManager.TextureManager.Free;
+  TTextureManager.TextureManager := nil;
 
 end.

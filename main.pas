@@ -456,9 +456,7 @@ type
     POVexit: boolean;
     TextureVersion: integer;
     Halos: TList<THalo>;
-    TextureManager: TTextureManager;
     ObjectGallery: TList<TShape>;
-    SceneManager: TSceneManager;
 
     procedure CenterView;
     procedure SetCurrent;
@@ -498,9 +496,9 @@ var
 
 begin
   result := nil;
-  for i := 0 to TextureManager.Textures.Count - 1 do
+  for i := 0 to TTextureManager.TextureManager.Textures.Count - 1 do
   begin
-    texture := TextureManager.Textures[i];
+    texture := TTextureManager.TextureManager.Textures[i];
     if Texture.Name = name then
     begin
       result := texture;
@@ -589,8 +587,8 @@ begin
         maptext.Maps.Add(mapitem);
       end;
     end;
-    TextureManager.Textures.Add(maptext);
-    TextPaintBox.Width := TextureManager.Textures.Count * TextSize;
+    TTextureManager.TextureManager.Textures.Add(maptext);
+    TextPaintBox.Width := TTextureManager.TextureManager.Textures.Count * TextSize;
     TextPaintBox.Refresh;
   finally
     CloseFile(map);
@@ -620,7 +618,7 @@ begin
   begin
     NewSceneFile := False;
     Filename := OpenDialog.Filename;
-    SceneManager.LoadFromFile(Filename);
+    TSceneManager.SceneManager.LoadFromFile(Filename);
     MainPaintBox.Refresh;
     SetCaption(Filename);
     //MRUFileList.AddItem(Filename);
@@ -635,7 +633,7 @@ begin
   if SaveDialog.Execute then
   begin
     Filename := SaveDialog.Filename;
-    SceneManager.Save(Filename);
+    TSceneManager.SceneManager.Save(Filename);
     SetCaption(Filename);
     //MRUFileList.AddItem(Filename);
   end;
@@ -763,13 +761,10 @@ begin
 
   TextureVersion := ModelVersion;
   Halos := TList<THalo>.Create;
-  TextureManager := TTextureManager.Create;
   ModifiedHalos := false;
   ModifiedTextures := False;
 
   ObjectGallery := TList<TShape>.Create;
-
-  SceneManager := TSceneManager.Create;
 
   // Load halos (if they exist)
   if FileExists('Halos.mhf') then
@@ -783,14 +778,14 @@ begin
   name := GetModelDirectory + '\Textures.mtf';
 
   if FileExists(name) then
-    TextureManager.LoadTextures(name)
+    TTextureManager.TextureManager.LoadTextures(name)
   else
   begin
     name := GetModelDirectory + '\Textures.mlb';
-    TextureManager.LoadBasicTextures(name);
+    TTextureManager.TextureManager.LoadBasicTextures(name);
   end;
 
-  TextPaintBox.Width := TextureManager.Textures.Count * TextSize;
+  TextPaintBox.Width := TTextureManager.TextureManager.Textures.Count * TextSize;
 
   // Load file parameter (if there is one)
   if ParamCount > 0 then
@@ -801,7 +796,7 @@ begin
     // Make sure it's not a command
     if (Filename[1] <> '/') and (Filename[1] <> '-') then
     begin
-      SceneManager.LoadFromFile(ParamStr(1));
+      TSceneManager.SceneManager.LoadFromFile(ParamStr(1));
       SetCaption(Filename);
     end;
   end;
@@ -830,7 +825,7 @@ begin
     RealizePalette(Handle);
   end;
 
-  for i := 0 to TextureManager.Textures.Count - 1 do
+  for i := 0 to TTextureManager.TextureManager.Textures.Count - 1 do
   begin
     rect.left := i * TextSize;
     rect.right := (i + 1) * TextSize;
@@ -839,7 +834,7 @@ begin
 
     if IntersectRect(rect2, rect, TextPaintBox.Canvas.ClipRect) then
     begin
-      texture := TextureManager.Textures[i];
+      texture := TTextureManager.TextureManager.Textures[i];
       texture.Draw(i * TextSize, TextPaintBox.Canvas);
     end;
   end;
@@ -853,8 +848,8 @@ var
 
 begin
   i := X div TextSize;
-  if (i >= 0) and (i < TextureManager.Textures.Count) then
-    result := TextureManager.Textures[i]
+  if (i >= 0) and (i < TTextureManager.TextureManager.Textures.Count) then
+    result := TTextureManager.TextureManager.Textures[i]
   else
     result := nil;
 end;
@@ -895,7 +890,7 @@ begin
   texture := TextureHitTest(X);
   SetTexture(texture);
 
-  SceneManager.SetTexture(texture);
+  TSceneManager.SceneManager.SetTexture(texture);
   MainPaintBox.Refresh;
 end;
 
@@ -913,12 +908,12 @@ end;
 function TMainForm.QueryModified: boolean;
 begin
   result := False;
-  if ModifiedHalos or ModifiedTextures or SceneManager.IsModified then
+  if ModifiedHalos or ModifiedTextures or TSceneManager.SceneManager.IsModified then
   begin
     case MessageDlg('Do you wish to save your changes first?', mtConfirmation, [mbYes, mbNo, mbCancel], 0) of
       mrYes:
       begin
-        if SceneManager.IsModified then
+        if TSceneManager.SceneManager.IsModified then
         begin
           if NewSceneFile then
           begin
@@ -928,20 +923,20 @@ begin
             if SaveDialog.Execute then
             begin
               Filename := SaveDialog.Filename;
-              SceneManager.SaveToFile(Filename);
+              TSceneManager.SceneManager.SaveToFile(Filename);
             end;
           end
           else
           begin
-            SceneManager.SaveToFile(Filename);
+            TSceneManager.SceneManager.SaveToFile(Filename);
           end;
         end;
 
         if ModifiedHalos then
           SaveHalos('halos.mhf');
 
-        if TextureManager.IsModified then
-          TextureManager.SaveTextures('textures.mtf');
+        if TTextureManager.TextureManager.IsModified then
+          TTextureManager.TextureManager.SaveTextures('textures.mtf');
 
         result := True;
       end;
@@ -962,7 +957,7 @@ var
   shape: TShape;
 
 begin
-  with SceneManager do
+  with TSceneManager.SceneManager do
   begin
     shape := CreateShape(TCamera, 'Camera', 0, 0, 0);
     Shapes.Add(shape);
@@ -994,9 +989,9 @@ var
   texture: TTexture;
 
 begin
-  for i := 0 to TextureManager.Textures.Count - 1 do
+  for i := 0 to TTextureManager.TextureManager.Textures.Count - 1 do
   begin
-    texture := TextureManager.Textures[i];
+    texture := TTextureManager.TextureManager.Textures[i];
     list.Items.AddObject(texture.Name, texture);
   end;
   list.ItemIndex := 0;
@@ -1019,22 +1014,22 @@ begin
     // Floor
     if dlg.FloorCheck.Checked then
     begin
-      shape := SceneManager.CreateShape(TPlane, 'Floor', 0, -1, 0);
+      shape := TSceneManager.SceneManager.CreateShape(TPlane, 'Floor', 0, -1, 0);
       shape.Rotate.X := 90;
-      SceneManager.Shapes.Add(shape);
+      TSceneManager.SceneManager.Shapes.Add(shape);
       shape.Texture :=
         dlg.TextureList.Items.Objects[dlg.TextureList.ItemIndex] as TTexture;
     end;
 
     // Camera
-    shape := SceneManager.CreateShape(TCamera, 'Camera', 0, 0, 0);
+    shape := TSceneManager.SceneManager.CreateShape(TCamera, 'Camera', 0, 0, 0);
     camera := shape as TCamera;
     case dlg.CameraList.ItemIndex of
       CameraLeft:   camera.Observer.X := -5;
       CameraRight:  camera.Observer.X := 5;
     end;
-    SceneManager.Shapes.Add(camera);
-    SceneManager.SetCamera(camera);
+    TSceneManager.SceneManager.Shapes.Add(camera);
+    TSceneManager.SceneManager.SetCamera(camera);
 
     // Light
     case dlg.LightList.ItemIndex of
@@ -1044,8 +1039,8 @@ begin
     else
       x := 0;
     end;
-    shape := SceneManager.CreateShape(TLight, 'Light', x, 3, -2);
-    SceneManager.Shapes.Add(shape);
+    shape := TSceneManager.SceneManager.CreateShape(TLight, 'Light', x, 3, -2);
+    TSceneManager.SceneManager.Shapes.Add(shape);
 
     // Object
     case dlg.ObjectList.ItemIndex of
@@ -1055,7 +1050,7 @@ begin
     else
       what := nil
     end;
-    shape := SceneManager.CreateShape(what, 'Object', 0, 1.2, 0);
+    shape := TSceneManager.SceneManager.CreateShape(what, 'Object', 0, 1.2, 0);
     shape.Texture :=
       dlg.ObjTextList.Items.Objects[dlg.ObjTextList.ItemIndex] as TTexture;
     case dlg.ObjectList.ItemIndex of
@@ -1071,11 +1066,11 @@ begin
         solid.CreateCylinder;
       end;
     end;
-    SceneManager.Shapes.Add(shape);
+    TSceneManager.SceneManager.Shapes.Add(shape);
 
     // Finish up
-    SceneManager.SetModified;
-    SceneManager.Make;
+    TSceneManager.SceneManager.SetModified;
+    TSceneManager.SceneManager.Make;
     MainPaintBox.Refresh;
   end;
 
@@ -1092,7 +1087,7 @@ begin
     dlg := TNewSceneDlg.Create(Application);
     if dlg.ShowModal = idOK then
     begin
-      SceneManager.Empty;
+      TSceneManager.SceneManager.Empty;
       case dlg.ListBox.ItemIndex of
         0: BlankScene;
         1: SimpleScene;
@@ -1115,7 +1110,7 @@ var
 begin
   with MainPaintBox do
   begin
-    view := SceneManager.GetView;
+    view := TSceneManager.SceneManager.GetView;
 
     oldPal := SelectPalette(Canvas.Handle, Palette, False);
     RealizePalette(Canvas.Handle);
@@ -1130,7 +1125,7 @@ begin
         LineTo(ViewSize, ViewSize * 2);
       end;
 
-    SceneManager.Draw(Canvas);
+    TSceneManager.SceneManager.Draw(Canvas);
 
     SelectPalette(Canvas.Handle, oldPal, False);
   end;
@@ -1143,26 +1138,26 @@ end;
 
 procedure TMainForm.ViewTabsClick(Sender: TObject);
 begin
-  SceneManager.GetView;
+  TSceneManager.SceneManager.GetView;
 
   case ViewTabs.TabIndex of
-    0: SceneManager.SetView(vwFront);
-    1: SceneManager.SetView(vwBack);
-    2: SceneManager.SetView(vwTop);
-    3: SceneManager.SetView(vwBottom);
-    4: SceneManager.SetView(vwLeft);
-    5: SceneManager.SetView(vwRight);
-    6: SceneManager.SetView(vwCamera);
+    0: TSceneManager.SceneManager.SetView(vwFront);
+    1: TSceneManager.SceneManager.SetView(vwBack);
+    2: TSceneManager.SceneManager.SetView(vwTop);
+    3: TSceneManager.SceneManager.SetView(vwBottom);
+    4: TSceneManager.SceneManager.SetView(vwLeft);
+    5: TSceneManager.SceneManager.SetView(vwRight);
+    6: TSceneManager.SceneManager.SetView(vwCamera);
   end;
 
-  SceneManager.Make;
+  TSceneManager.SceneManager.Make;
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.ViewTabsChange(Sender: TObject; NewTab: Integer;
   var AllowChange: Boolean);
 begin
-  if (NewTab = 6) and (SceneManager.GetCamera = nil) then
+  if (NewTab = 6) and (TSceneManager.SceneManager.GetCamera = nil) then
   begin
     MessageDlg('You need to create or select a camera first', mtError, [mbok], 0);
     AllowChange := False;
@@ -1183,7 +1178,7 @@ var
   shape: TShape;
 
 begin
-  shape := SceneManager.GetCurrent;
+  shape := TSceneManager.SceneManager.GetCurrent;
 
   if shape <> nil then
   begin
@@ -1299,7 +1294,7 @@ end;
 procedure TMainForm.MainPaintBoxMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  SceneManager.MouseDown(Shift, X, Y);
+  TSceneManager.SceneManager.MouseDown(Shift, X, Y);
   SetCurrent;
   MainPaintBox.Refresh;
 end;
@@ -1315,7 +1310,7 @@ var
   previous, details: TTransform;
 
 begin
-  shape := SceneManager.GetCurrent;
+  shape := TSceneManager.SceneManager.GetCurrent;
   if shape <> nil then
   begin
     previous := TTransform.Create;
@@ -1326,7 +1321,7 @@ begin
     previous.Scale.Copy(shape.Scale);
     previous.Rotate.Copy(shape.Rotate);
 
-    SceneManager.AddUndo(utTransformShape, shape, previous, details);
+    TSceneManager.SceneManager.AddUndo(utTransformShape, shape, previous, details);
 
     shape.Name := Name.Text;
 
@@ -1356,9 +1351,9 @@ begin
     details.Scale.Copy(shape.Scale);
     details.Rotate.Copy(shape.Rotate);
 
-    SceneManager.SetModified;
+    TSceneManager.SceneManager.SetModified;
 
-    SceneManager.Make;
+    TSceneManager.SceneManager.Make;
     MainPaintBox.Refresh;
   end;
 
@@ -1368,21 +1363,21 @@ end;
 procedure TMainForm.MainPaintBoxMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 begin
-  SceneManager.MouseMove(X, Y);
+  TSceneManager.SceneManager.MouseMove(X, Y);
 end;
 
 procedure TMainForm.SelectItemClick(Sender: TObject);
 begin
-  SceneManager.SetMode(mdSelect);
+  TSceneManager.SceneManager.SetMode(mdSelect);
   SelectItem.Checked := True;
   SelectBtn.Down := True;
 end;
 
 procedure TMainForm.TranslateItemClick(Sender: TObject);
 begin
-  if SceneManager.GetCurrent <> nil then
+  if TSceneManager.SceneManager.GetCurrent <> nil then
   begin
-    SceneManager.SetMode(mdTranslate);
+    TSceneManager.SceneManager.SetMode(mdTranslate);
     TranslateItem.Checked := True;
     TranslateBtn.Down := True;
   end;
@@ -1390,9 +1385,9 @@ end;
 
 procedure TMainForm.ScaleItemClick(Sender: TObject);
 begin
-  if SceneManager.GetCurrent <> nil then
+  if TSceneManager.SceneManager.GetCurrent <> nil then
   begin
-    SceneManager.SetMode(mdScale);
+    TSceneManager.SceneManager.SetMode(mdScale);
     ScaleItem.Checked := True;
     ScaleBtn.Down := True;
   end;
@@ -1400,9 +1395,9 @@ end;
 
 procedure TMainForm.RotateItemClick(Sender: TObject);
 begin
-  if SceneManager.GetCurrent <> nil then
+  if TSceneManager.SceneManager.GetCurrent <> nil then
   begin
-    SceneManager.SetMode(mdRotate);
+    TSceneManager.SceneManager.SetMode(mdRotate);
     RotateItem.Checked := True;
     RotateBtn.Down := True;
   end;
@@ -1410,82 +1405,82 @@ end;
 
 procedure TMainForm.SelectBtnClick(Sender: TObject);
 begin
-  SceneManager.SetMode(mdSelect);
+  TSceneManager.SceneManager.SetMode(mdSelect);
   SelectItem.Checked := True;
 end;
 
 procedure TMainForm.TranslateBtnClick(Sender: TObject);
 begin
-  if SceneManager.GetCurrent <> nil then
+  if TSceneManager.SceneManager.GetCurrent <> nil then
   begin
-    SceneManager.SetMode(mdTranslate);
+    TSceneManager.SceneManager.SetMode(mdTranslate);
     TranslateItem.Checked := True;
   end;
 end;
 
 procedure TMainForm.ScaleBtnClick(Sender: TObject);
 begin
-  if SceneManager.GetCurrent <> nil then
+  if TSceneManager.SceneManager.GetCurrent <> nil then
   begin
-    SceneManager.SetMode(mdScale);
+    TSceneManager.SceneManager.SetMode(mdScale);
     ScaleItem.Checked := True;
   end;
 end;
 
 procedure TMainForm.RotateBtnClick(Sender: TObject);
 begin
-  if SceneManager.GetCurrent <> nil then
+  if TSceneManager.SceneManager.GetCurrent <> nil then
   begin
-    SceneManager.SetMode(mdRotate);
+    TSceneManager.SceneManager.SetMode(mdRotate);
     RotateItem.Checked := True;
   end;
 end;
 
 procedure TMainForm.CameraItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TCamera);
+  TSceneManager.SceneManager.SetCreateWhat(TCamera);
   CameraBtn.Down := True;
   CameraItem.Checked := True;
 end;
 
 procedure TMainForm.PointItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TLight);
+  TSceneManager.SceneManager.SetCreateWhat(TLight);
   LightBtn.Down := True;
   PointItem.Checked := True;
 end;
 
 procedure TMainForm.SpotItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TSpotLight);
+  TSceneManager.SceneManager.SetCreateWhat(TSpotLight);
   LightBtn.Down := True;
   SpotItem.Checked := True;
 end;
 
 procedure TMainForm.AreaItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TAreaLight);
+  TSceneManager.SceneManager.SetCreateWhat(TAreaLight);
   LightBtn.Down := True;
   AreaItem.Checked := True;
 end;
 
 procedure TMainForm.PlaneItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TPlane);
+  TSceneManager.SceneManager.SetCreateWhat(TPlane);
   PlaneItem.Checked := True;
   PlaneBtn.Down := True;
 end;
 
 procedure TMainForm.SphereItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TSphere);
+  TSceneManager.SceneManager.SetCreateWhat(TSphere);
   SphereItem.Checked := True;
   SphereBtn.Down := True;
 end;
 
 procedure TMainForm.CubeItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TCube);
+  TSceneManager.SceneManager.SetCreateWhat(TCube);
   CubeItem.Checked := True;
   CubeBtn.Down := True;
 end;
@@ -1497,10 +1492,10 @@ var
 begin
   dlg := TGridDlg.Create(Application);
 
-  dlg.Grid.Text := FloatToStrF(SceneManager.GetGrid, ffFixed, 6, 4);
+  dlg.Grid.Text := FloatToStrF(TSceneManager.SceneManager.GetGrid, ffFixed, 6, 4);
 
   if dlg.ShowModal = idOK then
-    SceneManager.SetGrid(StrToFloat(dlg.Grid.Text));
+    TSceneManager.SceneManager.SetGrid(StrToFloat(dlg.Grid.Text));
 
   dlg.Free;
 end;
@@ -1511,7 +1506,7 @@ var
   dlg: TZoomDlg;
 
 begin
-  SceneManager.GetScale(m, d);
+  TSceneManager.SceneManager.GetScale(m, d);
 
   dlg := TZoomDlg.Create(Application);
 
@@ -1520,8 +1515,8 @@ begin
 
   if dlg.ShowModal = idOK then
   begin
-    SceneManager.SetScale(StrToInt(dlg.Multiplier.Text), StrToInt(dlg.Divisor.Text));
-    SceneManager.Make;
+    TSceneManager.SceneManager.SetScale(StrToInt(dlg.Multiplier.Text), StrToInt(dlg.Divisor.Text));
+    TSceneManager.SceneManager.Make;
     MainPaintBox.Refresh;
   end;
 
@@ -1530,29 +1525,29 @@ end;
 
 procedure TMainForm.ConeItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateSolid(stCone);
+  TSceneManager.SceneManager.SetCreateSolid(stCone);
   ConeItem.Checked := True;
   ConeBtn.Down := True;
 end;
 
 procedure TMainForm.CylinderItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateSolid(stCylinder);
+  TSceneManager.SceneManager.SetCreateSolid(stCylinder);
   CylinderItem.Checked := True;
   CylinderBtn.Down := True;
 end;
 
 procedure TMainForm.SolidItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateSolid(stSolid);
+  TSceneManager.SceneManager.SetCreateSolid(stSolid);
   SolidItem.Checked := True;
   SolidBtn.Down := True;
 end;
 
 procedure TMainForm.PolygonItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TPolygon);
-  SceneManager.CreateExtrusion := False;
+  TSceneManager.SceneManager.SetCreateWhat(TPolygon);
+  TSceneManager.SceneManager.CreateExtrusion := False;
   PolygonItem.Checked := True;
   PolygonBtn.Down := True;
 end;
@@ -1562,7 +1557,7 @@ var
   shape: TShape;
 
 begin
-  shape := SceneManager.GetCurrent;
+  shape := TSceneManager.SceneManager.GetCurrent;
   if shape <> nil then
     shape.Details;
 end;
@@ -1572,7 +1567,7 @@ var
   shape: TShape;
 
 begin
-  shape := SceneManager.GetCurrent;
+  shape := TSceneManager.SceneManager.GetCurrent;
   if shape <> nil then
     shape.Info;
 end;
@@ -1584,8 +1579,8 @@ var
 begin
   dlg := TFileInfoDlg.Create(Application);
 
-  dlg.Objects.Text := IntToStr(SceneManager.Shapes.Count);
-  dlg.Textures.Text := IntToStr(TextureManager.Textures.Count);
+  dlg.Objects.Text := IntToStr(TSceneManager.SceneManager.Shapes.Count);
+  dlg.Textures.Text := IntToStr(TTextureManager.TextureManager.Textures.Count);
 
   dlg.ShowModal;
   dlg.Free;
@@ -1625,12 +1620,12 @@ begin
       Screen.Cursor := crHourglass;
       try
         case SaveDialog.FilterIndex of
-          1: SceneManager.GenerateV30(SaveDialog.Filename);
-          2: SceneManager.GenerateCoolRay(SaveDialog.Filename);
-          3: SceneManager.GenerateVRML(SaveDialog.Filename);
-          4: SceneManager.GenerateVRML2(SaveDialog.Filename);
-          5: SceneManager.GenerateUDO(SaveDialog.Filename);
-          6: SceneManager.GenerateDirectX(SaveDialog.Filename, options);
+          1: TSceneManager.SceneManager.GenerateV30(SaveDialog.Filename);
+          2: TSceneManager.SceneManager.GenerateCoolRay(SaveDialog.Filename);
+          3: TSceneManager.SceneManager.GenerateVRML(SaveDialog.Filename);
+          4: TSceneManager.SceneManager.GenerateVRML2(SaveDialog.Filename);
+          5: TSceneManager.SceneManager.GenerateUDO(SaveDialog.Filename);
+          6: TSceneManager.SceneManager.GenerateDirectX(SaveDialog.Filename, options);
         end;
       finally
         Screen.Cursor := crDefault;
@@ -1644,24 +1639,24 @@ end;
 
 procedure TMainForm.DeleteItemClick(Sender: TObject);
 begin
-  if SceneManager.Delete then
+  if TSceneManager.SceneManager.Delete then
     MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.CutItemClick(Sender: TObject);
 begin
-  if SceneManager.CutSelected then
+  if TSceneManager.SceneManager.CutSelected then
     MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.CopyItemClick(Sender: TObject);
 begin
-  SceneManager.CopySelected;
+  TSceneManager.SceneManager.CopySelected;
 end;
 
 procedure TMainForm.PasteItemClick(Sender: TObject);
 begin
-  SceneManager.Paste(False);
+  TSceneManager.SceneManager.Paste(False);
   MainPaintBox.Refresh;
 end;
 
@@ -1727,7 +1722,7 @@ var
   w, h, name, command: string;
 
 begin
-  if not SceneManager.CheckShapeTexture then
+  if not TSceneManager.SceneManager.CheckShapeTexture then
   begin
     if MessageDlg('Not all your objects have textures. Do you still wish to continue?',
       mtConfirmation, [mbYes, mbNo], 0) = mrNo then
@@ -1751,7 +1746,7 @@ begin
       name := dlg.SceneFile.Text;
 
       // Generate the scene
-      SceneManager.GenerateV30(name);
+      TSceneManager.SceneManager.GenerateV30(name);
 
       i := Pos('x', dlg.ImageSize.Text);
       w := Copy(dlg.ImageSize.Text, 1, i - 1);
@@ -1785,10 +1780,10 @@ begin
   if Source = MainPaintBox then
   begin
     Accept := True;
-    { current := } SceneManager.GetCurrent;
+    { current := } TSceneManager.SceneManager.GetCurrent;
 
     { current.Draw(SceneData, MainPaintBox.Canvas, pmXor); }
-    if SceneManager.DragOver(x, y) then
+    if TSceneManager.SceneManager.DragOver(x, y) then
       { current.Draw(SceneData, MainPaintBox.Canvas, pmXor); }
       MainPaintBox.Refresh;
   end
@@ -1810,7 +1805,7 @@ begin
   begin
     ext := UpperCase(ExtractFileExt(OpenDialog.Filename));
     if ext = '.RAW' then
-      SceneManager.ImportRAW(OpenDialog.Filename)
+      TSceneManager.SceneManager.ImportRAW(OpenDialog.Filename)
     else if ext = '.MAP' then
       ImportMap(OpenDialog.Filename)
     else if ext = '.UDO' then
@@ -1820,7 +1815,7 @@ end;
 
 procedure TMainForm.UserDefinedItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TUserShape);
+  TSceneManager.SceneManager.SetCreateWhat(TUserShape);
   UserDefinedItem.Checked := True;
   UserDefinedBtn.Down := True;
 end;
@@ -1882,7 +1877,7 @@ begin
   OpenDialog.Filter := 'Texture files (*.mtf)|*.mtf';
   if OpenDialog.Execute then
   begin
-    TextureManager.LoadTextures(OpenDialog.Filename);
+    TTextureManager.TextureManager.LoadTextures(OpenDialog.Filename);
     TextPaintBox.Refresh;
   end;
 end;
@@ -1893,7 +1888,7 @@ begin
   SaveDialog.DefaultExt := 'mtf';
   SaveDialog.Filter := 'Texture files (*.mtf)|*.mtf';
   if SaveDialog.Execute then
-    TextureManager.SaveTextures(SaveDialog.Filename);
+    TTextureManager.TextureManager.SaveTextures(SaveDialog.Filename);
 end;
 
 procedure TMainForm.HelpIndexItemClick(Sender: TObject);
@@ -1903,24 +1898,24 @@ end;
 
 procedure TMainForm.HeightFieldItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(THeightField);
+  TSceneManager.SceneManager.SetCreateWhat(THeightField);
 end;
 
 procedure TMainForm.UnionItemClick(Sender: TObject);
 begin
-  SceneManager.CreateGroup(gtUnion);
+  TSceneManager.SceneManager.CreateGroup(gtUnion);
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.IntersectionItemClick(Sender: TObject);
 begin
-  SceneManager.CreateGroup(gtIntersection);
+  TSceneManager.SceneManager.CreateGroup(gtIntersection);
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.DifferenceItemClick(Sender: TObject);
 begin
-  SceneManager.CreateGroup(gtDifference);
+  TSceneManager.SceneManager.CreateGroup(gtDifference);
   MainPaintBox.Refresh;
 end;
 
@@ -1935,7 +1930,7 @@ var
   shape: TShape;
 
 begin
-  shape := SceneManager.CreateGallery;
+  shape := TSceneManager.SceneManager.CreateGallery;
 
   if shape <> nil then
   begin
@@ -1948,13 +1943,13 @@ end;
 
 procedure TMainForm.SelectAllItemClick(Sender: TObject);
 begin
-  SceneManager.SelectAll;
+  TSceneManager.SceneManager.SelectAll;
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.ClearItemClick(Sender: TObject);
 begin
-  SceneManager.Clear;
+  TSceneManager.SceneManager.Clear;
   MainPaintBox.Refresh;
 end;
 
@@ -1964,7 +1959,7 @@ begin
   if Sender = MainPaintBox then
   begin
     { MainPaintBox.Refresh; }
-    SceneManager.EndDrag;
+    TSceneManager.SceneManager.EndDrag;
     SetCurrent;
   end;
 end;
@@ -1977,13 +1972,13 @@ end;
 
 procedure TMainForm.BlobItemClick(Sender: TObject);
 begin
-  SceneManager.CreateBlob;
+  TSceneManager.SceneManager.CreateBlob;
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.BicubicPatchItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TBicubicShape);
+  TSceneManager.SceneManager.SetCreateWhat(TBicubicShape);
   BicubicPatchItem.Checked := True;
   BicubicPatchBtn.Down := True;
 end;
@@ -1993,10 +1988,10 @@ var
   shape: TShape;
 
 begin
-  shape := SceneManager.GetCurrent;
+  shape := TSceneManager.SceneManager.GetCurrent;
   if (shape <> nil) and (sfHasObserver in shape.Features) then
   begin
-    SceneManager.SetMode(mdObserver);
+    TSceneManager.SceneManager.SetMode(mdObserver);
     ObserverItem.Checked := True;
     ObserverBtn.Down := True;
   end;
@@ -2007,8 +2002,8 @@ begin
   OpenDialog.Filter := 'All files (*.*)|*.*';
   if OpenDialog.Execute then
   begin
-    TextureManager.ImportTextures(OpenDialog.Filename);
-    TextPaintBox.Width := TextureManager.Textures.Count * TextSize;
+    TTextureManager.TextureManager.ImportTextures(OpenDialog.Filename);
+    TextPaintBox.Width := TTextureManager.TextureManager.Textures.Count * TextSize;
     TextPaintBox.Refresh;
   end;
 end;
@@ -2018,10 +2013,10 @@ var
   shape: TShape;
 
 begin
-  shape := SceneManager.GetCurrent;
+  shape := TSceneManager.SceneManager.GetCurrent;
   if (shape <> nil) and (sfHasObserved in shape.Features) then
   begin
-    SceneManager.SetMode(mdObserved);
+    TSceneManager.SceneManager.SetMode(mdObserved);
     ObservedItem.Checked := True;
     ObservedBtn.Down := True;
   end;
@@ -2083,14 +2078,14 @@ end;
 
 procedure TMainForm.DiscItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TDisc);
+  TSceneManager.SceneManager.SetCreateWhat(TDisc);
   DiscItem.Checked := True;
   DiscBtn.Down := True;
 end;
 
 procedure TMainForm.TorusItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TTorus);
+  TSceneManager.SceneManager.SetCreateWhat(TTorus);
   TorusItem.Checked := True;
   TorusBtn.Down := True;
 end;
@@ -2101,15 +2096,15 @@ begin
     SaveAsItemClick(Sender)
   else
   begin
-    SceneManager.SaveToFile(Filename);
+    TSceneManager.SceneManager.SaveToFile(Filename);
     //MRUFileList.AddItem(Filename);
   end;
 end;
 
 procedure TMainForm.Modify(shape: TShape);
 begin
-  shape.Make(SceneManager, shape.Triangles);
-  SceneManager.SetModified;
+  shape.Make(TSceneManager.SceneManager, shape.Triangles);
+  TSceneManager.SceneManager.SetModified;
   MainPaintBox.Refresh;
 end;
 
@@ -2123,16 +2118,16 @@ var
   hidden: boolean;
 
 begin
-  hidden := SceneManager.ToggleHiddenLineRemoval;
+  hidden := TSceneManager.SceneManager.ToggleHiddenLineRemoval;
   HiddenLineRemovalItem.Checked := hidden;
 
   if hidden then
   begin
     LightShadingItem.Enabled := True;
-    LightShadingItem.Checked := SceneManager.GetLightShading;
+    LightShadingItem.Checked := TSceneManager.SceneManager.GetLightShading;
 
     OutlineItem.Enabled := True;
-    OutlineItem.Checked := SceneManager.GetOutline;
+    OutlineItem.Checked := TSceneManager.SceneManager.GetOutline;
   end
   else
   begin
@@ -2148,55 +2143,55 @@ end;
 
 procedure TMainForm.SuperEllipsoidItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TSuperEllipsoid);
+  TSceneManager.SceneManager.SetCreateWhat(TSuperEllipsoid);
   SuperEllipsoidItem.Checked := True;
   SuperBtn.Down := True;
 end;
 
 procedure TMainForm.PasteMultipleItemClick(Sender: TObject);
 begin
-  SceneManager.Paste(True);
+  TSceneManager.SceneManager.Paste(True);
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.MergeItemClick(Sender: TObject);
 begin
-  SceneManager.CreateGroup(gtMerge);
+  TSceneManager.SceneManager.CreateGroup(gtMerge);
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.CylinderLightItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TCylinderLight);
+  TSceneManager.SceneManager.SetCreateWhat(TCylinderLight);
   LightBtn.Down := True;
   CylinderLightItem.Checked := True;
 end;
 
 procedure TMainForm.TextItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TText);
+  TSceneManager.SceneManager.SetCreateWhat(TText);
   TextItem.Checked := True;
   TextBtn.Down := True;
 end;
 
 procedure TMainForm.ExtrusionItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TPolygon);
-  SceneManager.CreateExtrusion := True;
+  TSceneManager.SceneManager.SetCreateWhat(TPolygon);
+  TSceneManager.SceneManager.CreateExtrusion := True;
   ExtrusionItem.Checked := True;
   ExtrusionBtn.Down := True;
 end;
 
 procedure TMainForm.LatheItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TLathe);
+  TSceneManager.SceneManager.SetCreateWhat(TLathe);
   LatheItem.Checked := True;
   LatheBtn.Down := True;
 end;
 
 procedure TMainForm.JuliaFractalItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TJuliaFractal);
+  TSceneManager.SceneManager.SetCreateWhat(TJuliaFractal);
   JuliaFractalItem.Checked := True;
 end;
 
@@ -2205,11 +2200,11 @@ var
   shape: TShape;
 
 begin
-  shape := SceneManager.GetCurrent;
+  shape := TSceneManager.SceneManager.GetCurrent;
 
   if shape <> nil then
   begin
-    UniformScalingItem.Checked := SceneManager.GetUniformScaling;
+    UniformScalingItem.Checked := TSceneManager.SceneManager.GetUniformScaling;
     ShadowItem.Checked := sfShadow in shape.Flags;
     HollowItem.Checked := sfHollow in shape.Flags;
   end
@@ -2226,7 +2221,7 @@ var
   shape: TShape;
 
 begin
-  shape := SceneManager.GetCurrent;
+  shape := TSceneManager.SceneManager.GetCurrent;
 
   if shape <> nil then
   begin
@@ -2235,7 +2230,7 @@ begin
     else
       shape.Flags := shape.Flags + [sfHollow];
 
-    SceneManager.SetModified;
+    TSceneManager.SceneManager.SetModified;
   end;
 end;
 
@@ -2244,7 +2239,7 @@ var
   shape: TShape;
 
 begin
-  shape := SceneManager.GetCurrent;
+  shape := TSceneManager.SceneManager.GetCurrent;
 
   if shape <> nil then
   begin
@@ -2253,7 +2248,7 @@ begin
     else
       shape.Flags := shape.Flags + [sfShadow];
 
-    SceneManager.SetModified;
+    TSceneManager.SceneManager.SetModified;
   end;
 end;
 
@@ -2271,25 +2266,25 @@ end;
 
 procedure TMainForm.LightShadingItemClick(Sender: TObject);
 begin
-  LightShadingItem.Checked := SceneManager.ToggleLightShading;
+  LightShadingItem.Checked := TSceneManager.SceneManager.ToggleLightShading;
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.OutlineItemClick(Sender: TObject);
 begin
-  OutlineItem.Checked := SceneManager.ToggleOutline;
+  OutlineItem.Checked := TSceneManager.SceneManager.ToggleOutline;
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.EditMenuClick(Sender: TObject);
 begin
-  UndoItem.Enabled := SceneManager.CanUndo;
-  RedoItem.Enabled := SceneManager.CanRedo;
+  UndoItem.Enabled := TSceneManager.SceneManager.CanUndo;
+  RedoItem.Enabled := TSceneManager.SceneManager.CanRedo;
 end;
 
 procedure TMainForm.UndoItemClick(Sender: TObject);
 begin
-  if SceneManager.Undo then
+  if TSceneManager.SceneManager.Undo then
     MainPaintBox.Refresh;
 end;
 
@@ -2305,21 +2300,21 @@ end;
 
 procedure TMainForm.ScaleUpBtnClick(Sender: TObject);
 begin
-  SceneManager.ScaleUp;
-  SceneManager.Make;
+  TSceneManager.SceneManager.ScaleUp;
+  TSceneManager.SceneManager.Make;
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.ScaleDownBtnClick(Sender: TObject);
 begin
-  SceneManager.ScaleDown;
-  SceneManager.Make;
+  TSceneManager.SceneManager.ScaleDown;
+  TSceneManager.SceneManager.Make;
   MainPaintBox.Refresh;
 end;
 
 procedure TMainForm.LensFlareItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateScripted(siLight);
+  TSceneManager.SceneManager.SetCreateScripted(siLight);
   LightBtn.Down := True;
   LensFlareItem.Checked := True;
 end;
@@ -2345,7 +2340,7 @@ begin
         mode := SetMapMode(Canvas.Handle, MM_ISOTROPIC);
         SetWindowExtEx(Canvas.Handle, 2000, 2000, nil);
         SetViewportExtEx(Canvas.Handle, PageWidth, PageHeight, nil);
-        SceneManager.Print(Canvas)
+        TSceneManager.SceneManager.Print(Canvas)
       finally
         SetMapMode(Canvas.Handle, mode);
         EndDoc;
@@ -2361,16 +2356,16 @@ end;
 
 procedure TMainForm.SpringItemClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TSpring);
+  TSceneManager.SceneManager.SetCreateWhat(TSpring);
   SpringBtn.Down := True;
   SpringItem.Checked := True;
 end;
 
 procedure TMainForm.UniformScalingBtnClick(Sender: TObject);
 begin
-  if SceneManager.GetCurrent <> nil then
+  if TSceneManager.SceneManager.GetCurrent <> nil then
   begin
-    SceneManager.SetMode(mdScaleUniform);
+    TSceneManager.SceneManager.SetMode(mdScaleUniform);
     UniformScalingItem.Checked := True;
     UniformScalingBtn.Down := True;
   end;
@@ -2403,7 +2398,7 @@ procedure TMainForm.MRUFileListMRUItemClick(Sender: TObject;
 begin
   NewSceneFile := False;
   Filename := AFilename;
-  SceneManager.LoadFromFile(Filename);
+  TSceneManager.SceneManager.LoadFromFile(Filename);
   MainPaintBox.Refresh;
   SetCaption(Filename);
 end;
@@ -2420,7 +2415,7 @@ begin
 
   if dlg.ShowModal = IDOK then
   begin
-    SceneManager.GenerateCoolRay(dlg.SceneFile.Text);
+    TSceneManager.SceneManager.GenerateCoolRay(dlg.SceneFile.Text);
 
     command := CoolRayCommand + ' ' + dlg.SceneFile.Text + ' output.jpg';
 
@@ -2432,7 +2427,7 @@ end;
 
 procedure TMainForm.EnvBtnClick(Sender: TObject);
 begin
-  SceneManager.SetCreateWhat(TEnvironment);
+  TSceneManager.SceneManager.SetCreateWhat(TEnvironment);
   EnvBtn.Down := True;
   EnvItem.Checked := True;
 end;
@@ -2468,9 +2463,9 @@ end;
 
 procedure TMainForm.AnimationTimerTimer(Sender: TObject);
 begin
-  SceneManager.NextFrame;
+  TSceneManager.SceneManager.NextFrame;
 
-  FrameBar.Position := SceneManager.AnimationPosition;
+  FrameBar.Position := TSceneManager.SceneManager.AnimationPosition;
 end;
 
 procedure TMainForm.StopActionExecute(Sender: TObject);

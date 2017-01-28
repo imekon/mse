@@ -71,7 +71,7 @@ end;
 procedure TGroupEditor.SetGroup(AGroup: TGroupShape);
 begin
   group := AGroup;
-  group.Make(MainForm.SceneManager, group.GhostTriangles);
+  group.Make(TSceneManager.SceneManager, group.GhostTriangles);
   Show;
   CenterView;
 end;
@@ -106,7 +106,7 @@ begin
   for i := 0 to group.Shapes.Count - 1 do
   begin
     shape := group.Shapes[i] as TShape;
-    shape.Draw(MainForm.SceneManager, shape.GhostTriangles, PaintBox.Canvas, pmCopy);
+    shape.Draw(TSceneManager.SceneManager, shape.GhostTriangles, PaintBox.Canvas, pmCopy);
   end;
 end;
 

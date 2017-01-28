@@ -190,7 +190,7 @@ begin
     Triangles.Add(triangle);
   end;
 
-  if MainForm.SceneManager.FileVersion > 7 then
+  if TSceneManager.SceneManager.FileVersion > 7 then
     source.ReadBuffer(SmoothShaded, sizeof(SmoothShaded));
 end;
 
@@ -265,7 +265,7 @@ var
 begin
   result := False;
 
-  if Mainform.SceneManager.CreateExtrusion then
+  if TSceneManager.SceneManager.CreateExtrusion then
   begin
     ext := TCreateExtrusionDialog.Create(Application);
 

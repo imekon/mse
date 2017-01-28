@@ -191,7 +191,7 @@ end;
 procedure TSolidEditor.UpdateSolid;
 begin
   Solid.Rebuild;
-  Solid.Make(MainForm.SceneManager, Solid.Triangles);
+  Solid.Make(TSceneManager.SceneManager, Solid.Triangles);
   MainForm.MainPaintBox.Refresh;
   PaintBox.Refresh;
 end;

@@ -21,9 +21,10 @@ unit textform;
 interface
 
 uses
-  System.UITypes,
+  System.UITypes, Scene,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, ExtCtrls, Buttons, ToolWin, Menus, Texture, StdCtrls, ImgList, Clipbrd,
+  ComCtrls, ExtCtrls, Buttons, ToolWin, Menus,
+  Texture.Manager, Texture, StdCtrls, ImgList, Clipbrd,
   rgbframe, turbframe, ActnList, System.Actions, System.ImageList;
 
 type
@@ -402,7 +403,7 @@ var
 
 begin
   texture := ATexture.Create;
-  texture.Name := 'Texture' + IntToStr(MainForm.TextureManager.Textures.Count);
+  texture.Name := 'Texture' + IntToStr(TTextureManager.TextureManager.Textures.Count);
   result := texture
 end;
 
@@ -414,7 +415,7 @@ begin
   map := TMapTexture.Create;
 
   map.MapType := AType;
-  map.Name := 'Map' + IntToStr(MainForm.TextureManager.Textures.Count);
+  map.Name := 'Map' + IntToStr(TTextureManager.TextureManager.Textures.Count);
   map.CreateSimple;
 
   result := map
@@ -428,7 +429,7 @@ begin
   map := TSpiralTexture.Create;
 
   map.MapType := AType;
-  map.Name := 'Spiral' + IntToStr(MainForm.TextureManager.Textures.Count);
+  map.Name := 'Spiral' + IntToStr(TTextureManager.TextureManager.Textures.Count);
   map.CreateSimple;
 
   result := map
@@ -485,8 +486,8 @@ begin
 
     if texture <> nil then
     begin
-      MainForm.TextureManager.Textures.Add(texture);
-      MainForm.TextPaintBox.Width := MainForm.TextureManager.Textures.Count * TextSize;
+      TTextureManager.TextureManager.Textures.Add(texture);
+      MainForm.TextPaintBox.Width := TTextureManager.TextureManager.Textures.Count * TextSize;
       MainForm.TextPaintBox.Refresh;
 
       node := AddTexture(texture);
@@ -585,9 +586,9 @@ begin
   TextureImage.AddIcon(TextureFolder);
 
   // Walk the list of textures
-  for i := 0 to MainForm.TextureManager.Textures.Count - 1 do
+  for i := 0 to TTextureManager.TextureManager.Textures.Count - 1 do
   begin
-    texture := MainForm.TextureManager.Textures[i];
+    texture := TTextureManager.TextureManager.Textures[i];
     AddTexture(texture);
   end;
 
@@ -858,7 +859,7 @@ begin
     GetNormalSheet;
     GetFinishSheet;
 
-    MainForm.SceneManager.SetModified;
+    TSceneManager.SceneManager.SetModified;
   end;
 
   Dirty := false;
@@ -1375,14 +1376,14 @@ begin
 
         if Length(user.Name) > 0 then
         begin
-          MainForm.TextureManager.Textures.Add(user);
+          TTextureManager.TextureManager.Textures.Add(user);
 
           AddTexture(user);
         end
         else
           user.Free;
       end;
-      MainForm.TextPaintBox.Width := MainForm.TextureManager.Textures.Count * TextSize;
+      MainForm.TextPaintBox.Width := TTextureManager.TextureManager.Textures.Count * TextSize;
       MainForm.TextPaintBox.Refresh;
     finally
       source.Free;
