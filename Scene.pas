@@ -1800,7 +1800,7 @@ begin
   b := StrToInt(obj.GetValue('flags').Value);
   Flags := TShapeFlags(b);
   s := obj.GetValue('texture').Value;
-  Texture := MainForm.FindTexture(s);
+  Texture := TTextureManager.TextureManager.FindTexture(s);
   s := obj.GetValue('layer').Value;
   Layer := TSceneManager.SceneManager.FindLayer(s);
 end;
@@ -1839,7 +1839,7 @@ begin
 
   // Load texture
   LoadStringFromStream(buffer, source);
-  Texture := MainForm.FindTexture(buffer);
+  Texture := TTextureManager.TextureManager.FindTexture(buffer);
 
   // Load layer
   if TSceneManager.SceneManager.FileVersion > 10 then

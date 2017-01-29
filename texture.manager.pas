@@ -21,6 +21,8 @@ type
     function ImportTextures(const filename: string): boolean;
     procedure SaveTextures(const filename: string);
 
+    function FindTexture(const Name: string): TTexture;
+
     class procedure Initialise;
     class procedure Shutdown;
 
@@ -45,6 +47,24 @@ begin
 
   _textures.Free;
   inherited;
+end;
+
+function TTextureManager.FindTexture(const Name: string): TTexture;
+var
+  i: integer;
+  texture: TTexture;
+
+begin
+  result := nil;
+  for i := 0 to TTextureManager.TextureManager.Textures.Count - 1 do
+  begin
+    texture := TTextureManager.TextureManager.Textures[i];
+    if Texture.Name = name then
+    begin
+      result := texture;
+      Break;
+    end;
+  end;
 end;
 
 function TTextureManager.ImportTextures(const filename: string): boolean;

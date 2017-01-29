@@ -465,7 +465,7 @@ begin
 
   if texture <> nil then
   begin
-    while MainForm.FindTexture(texture.Name) <> nil do
+    while TTextureManager.TextureManager.FindTexture(texture.Name) <> nil do
     begin
       dlg := TChooseTextureNameDialog.Create(Application);
 

@@ -459,7 +459,6 @@ type
     procedure SetCurrent;
     procedure SetSelect;
     procedure SetTexture(texture: TTexture);
-    function FindTexture(const Name: string): TTexture;
     procedure BuildTextureList(list: TComboBox);
     function CreateGallery: TShape;
     procedure Modify(shape: TShape);
@@ -483,24 +482,6 @@ uses About, newscene, Plane, Sphere, Light, Cube, grid, zoom, Solid,
 procedure TMainForm.SetCaption(const Name: string);
 begin
   Caption := ExtractFileName(Name) + ' - Model Scene Editor';
-end;
-
-function TMainForm.FindTexture(const Name: string): TTexture;
-var
-  i: integer;
-  texture: TTexture;
-
-begin
-  result := nil;
-  for i := 0 to TTextureManager.TextureManager.Textures.Count - 1 do
-  begin
-    texture := TTextureManager.TextureManager.Textures[i];
-    if Texture.Name = name then
-    begin
-      result := texture;
-      Break;
-    end;
-  end;
 end;
 
 procedure TMainForm.ImportMap(const Name: string);
@@ -949,11 +930,11 @@ begin
     shape := CreateShape(TPlane, 'Floor', 0, -1, 0);
     shape.Rotate.X := 90;
     Shapes.Add(shape);
-    shape.Texture := FindTexture('Green');
+    shape.Texture := TTextureManager.TextureManager.FindTexture('Green');
 
     shape := CreateShape(TSphere, 'Ball', 0, 1.2, 0);
     Shapes.Add(shape);
-    shape.Texture := FindTexture('Blue');
+    shape.Texture := TTextureManager.TextureManager.FindTexture('Blue');
 
     SetModified;
 
