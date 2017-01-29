@@ -14,14 +14,15 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit About;
 
 interface
 
-uses Windows, Classes, SysUtils, Graphics, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, ComCtrls;
+uses
+  Winapi.Windows, System.Classes, System.SysUtils, VCL.Graphics, VCL.Forms,
+  VCL.Controls, VCL.StdCtrls, VCL.Buttons, VCL.ExtCtrls, VCL.ComCtrls;
 
 {$INCLUDE DirectX.inc}
 

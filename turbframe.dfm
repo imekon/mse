@@ -14,7 +14,7 @@ object TurbulenceFrame: TTurbulenceFrame
     object Label9: TLabel
       Left = 16
       Top = 24
-      Width = 54
+      Width = 53
       Height = 13
       Caption = 'T&urbulence'
     end
@@ -28,7 +28,7 @@ object TurbulenceFrame: TTurbulenceFrame
     object Label11: TLabel
       Left = 16
       Top = 72
-      Width = 38
+      Width = 37
       Height = 13
       Caption = '&Lambda'
     end

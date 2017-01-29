@@ -26,9 +26,10 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, VCL.Graphics,
   VCL.Forms, VCL.Controls, VCL.Menus,
   VCL.Dialogs, VCL.StdCtrls, VCL.Buttons, VCL.ExtCtrls, VCL.ComCtrls,
-  System.Win.Registry, Texture, Texture.Manager, Halo, VCL.Tabs,
-  Scene, VCL.ToolWin, VCL.ImgList, VCL.ActnList, System.ImageList,
-  System.Actions;
+  System.Win.Registry, Texture, VCL.Tabs,
+  VCL.ToolWin, VCL.ImgList, VCL.ActnList, System.ImageList,
+  System.Actions,
+  Scene, Texture.Manager, Halo;
 
 {$INCLUDE DirectX.inc}
 
