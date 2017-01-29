@@ -442,8 +442,6 @@ type
     procedure SimpleScene;
     procedure SceneWizard;
 
-    procedure LoadHalos(const Name: string);
-    procedure SaveHalos(const Name: string);
     procedure ImportMap(const Name: string);
     procedure ImportUDO(const name: string);
     procedure SetCaption(const Name: string);
@@ -455,7 +453,6 @@ type
     POVCommand, POVimageSize, CoolRayCommand: string;
     POVexit: boolean;
     TextureVersion: integer;
-    Halos: TList<THalo>;
     ObjectGallery: TList<TShape>;
 
     procedure CenterView;
@@ -463,7 +460,6 @@ type
     procedure SetSelect;
     procedure SetTexture(texture: TTexture);
     function FindTexture(const Name: string): TTexture;
-    function FindHalo(const Name: string): THalo;
     procedure BuildTextureList(list: TComboBox);
     function CreateGallery: TShape;
     procedure Modify(shape: TShape);
@@ -503,24 +499,6 @@ begin
     begin
       result := texture;
       Break;
-    end;
-  end;
-end;
-
-function TMainForm.FindHalo(const Name: string): THalo;
-var
-  i: integer;
-  halo: THalo;
-
-begin
-  result := nil;
-  for i := 0 to Halos.Count - 1 do
-  begin
-    halo := Halos[i];
-    if halo.Name = Name then
-    begin
-      result := halo;
-      break;
     end;
   end;
 end;
@@ -760,7 +738,9 @@ begin
   reg.Free;
 
   TextureVersion := ModelVersion;
-  Halos := TList<THalo>.Create;
+  THaloManager.Initialise;
+  TTextureManager.Initialise;
+  TSceneManager.Initialise;
   ModifiedHalos := false;
   ModifiedTextures := False;
 
@@ -768,7 +748,7 @@ begin
 
   // Load halos (if they exist)
   if FileExists('Halos.mhf') then
-    LoadHalos('Halos.mhf');
+    THaloManager.HaloManager.LoadHalos('Halos.mhf');
 
   // Load textures
   //
@@ -933,7 +913,7 @@ begin
         end;
 
         if ModifiedHalos then
-          SaveHalos('halos.mhf');
+          THaloManager.HaloManager.SaveHalos('halos.mhf');
 
         if TTextureManager.TextureManager.IsModified then
           TTextureManager.TextureManager.SaveTextures('textures.mtf');
@@ -1820,56 +1800,6 @@ begin
   UserDefinedBtn.Down := True;
 end;
 
-procedure TMainForm.LoadHalos(const Name: string);
-var
-  i, n: integer;
-  source: TFileStream;
-  halo: THalo;
-
-begin
-  Halos.Clear;
-  source := TFileStream.Create(Name, fmOpenRead);
-  try
-    source.ReadBuffer(n, sizeof(n));
-
-    for i := 1 to n do
-    begin
-      halo := THalo.Create;
-      halo.LoadFromFile(source);
-      Halos.Add(halo);
-    end;
-  finally
-    source.Free;
-    ModifiedHalos := false;
-  end;
-end;
-
-procedure TMainForm.SaveHalos(const Name: string);
-var
-  i, n: integer;
-  dest: TFileStream;
-  halo: THalo;
-
-begin
-  if Halos.Count > 0 then
-  begin
-    dest := TFileStream.Create(Name, fmOpenWrite or fmCreate);
-    try
-      n := Halos.Count;
-      dest.WriteBuffer(n, sizeof(n));
-
-      for i := 0 to n - 1 do
-      begin
-        halo := Halos[i];
-        halo.SaveToFile(dest);
-      end;
-    finally
-      dest.Free;
-      ModifiedHalos := false;
-    end;
-  end;
-end;
-
 procedure TMainForm.LoadTexturesItemClick(Sender: TObject);
 begin
   OpenDialog.Filename := 'textures.mtf';
@@ -2046,6 +1976,10 @@ var
   reg: TRegistry;
 
 begin
+  TSceneManager.Shutdown;
+  TTextureManager.Shutdown;
+  THaloManager.Shutdown;
+
   reg := TRegistry.Create;
 
   reg.RootKey := HKEY_CURRENT_USER;

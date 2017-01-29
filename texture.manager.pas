@@ -21,6 +21,9 @@ type
     function ImportTextures(const filename: string): boolean;
     procedure SaveTextures(const filename: string);
 
+    class procedure Initialise;
+    class procedure Shutdown;
+
     property IsModified: boolean read modified;
     property Textures: TList<TTexture> read _textures;
   end;
@@ -81,6 +84,11 @@ begin
   finally
     CloseFile(input);
   end;
+end;
+
+class procedure TTextureManager.Initialise;
+begin
+  TextureManager := TTextureManager.Create;
 end;
 
 function TTextureManager.LoadBasicTextures(const filename: string): boolean;
@@ -202,11 +210,10 @@ begin
   Modified := False;
 end;
 
-initialization
-  TTextureManager.TextureManager := TTextureManager.Create;
-
-finalization
-  TTextureManager.TextureManager.Free;
-  TTextureManager.TextureManager := nil;
+class procedure TTextureManager.Shutdown;
+begin
+  TextureManager.Free;
+  TextureManager := nil;
+end;
 
 end.

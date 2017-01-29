@@ -14,14 +14,18 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit halo;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, Forms, Vector, Scene;
+  Winapi.Windows,
+  System.IOUtils, System.SysUtils, System.Classes, System.Generics.Collections,
+  System.JSON,
+  VCL.Forms,
+  JSONHelper, Vector, MapText, Scene;
 
 type
   THaloType = (htAttenuating, htEmitting, htGlowing, htDust);
@@ -49,22 +53,36 @@ type
     Frequency: integer;
     Phase: double;
     Translate, Scale, Rotate: TVector;
-    ColourMaps: TList;
+    ColourMaps: TObjectList<TMapItem>;
 
     constructor Create;
     destructor Destroy; override;
     procedure ClearMaps;
-    procedure SaveToFile(dest: TStream);
-    procedure LoadFromFile(source: TStream);
+    procedure Save(parent: TJSONArray);
+    procedure Load(obj: TJSONObject);
     procedure Generate(var dest: TextFile);
     function Edit: boolean;
     procedure CreateSimple;
     procedure Copy(original: THalo);
   end;
 
+  THaloManager = class
+  public
+    Halos: TObjectList<THalo>;
+    class var HaloManager: THaloManager;
+    constructor Create;
+    destructor Destroy; override;
+    function FindHalo(const Name: string): THalo;
+    procedure LoadHalos(const filename: string);
+    procedure SaveHalos(const filename: string);
+
+    class procedure Initialise;
+    class procedure Shutdown;
+  end;
+
 implementation
 
-uses Misc, MapText, HaloDlg;
+uses Misc, HaloDlg;
 
 constructor THalo.Create;
 begin
@@ -93,7 +111,7 @@ begin
   Scale.Z := 1;
   Rotate := TVector.Create;
 
-  ColourMaps := TList.Create;
+  ColourMaps := TObjectList<TMapItem>.Create;
 end;
 
 destructor THalo.Destroy;
@@ -123,83 +141,72 @@ begin
   ColourMaps.Clear;
 end;
 
-procedure THalo.SaveToFile(dest: TStream);
+procedure THalo.Save(parent: TJSONArray);
 var
-  i, n: integer;
+  obj: TJSONObject;
   map: TMapItem;
+  colourMapsArray: TJSONArray;
 
 begin
-  SaveStringToStream(Name, dest);
-
-  dest.WriteBuffer(HaloType, sizeof(HaloType));
-  dest.WriteBuffer(HaloDensity, sizeof(HaloDensity));
-  dest.WriteBuffer(HaloMapping, sizeof(HaloMapping));
-  dest.WriteBuffer(DustType, sizeof(DustType));
-  dest.WriteBuffer(Eccentricity, sizeof(Eccentricity));
-  dest.WriteBuffer(MaxValue, sizeof(MaxValue));
-  dest.WriteBuffer(Exponent, sizeof(Exponent));
-  dest.WriteBuffer(Samples, sizeof(Samples));
-  dest.WriteBuffer(AALevel, sizeof(AALevel));
-  dest.WriteBuffer(AAThreshold, sizeof(AAThreshold));
-  dest.WriteBuffer(Jitter, sizeof(Jitter));
-  dest.WriteBuffer(Turbulence, sizeof(Turbulence));
-  dest.WriteBuffer(Octaves, sizeof(Octaves));
-  dest.WriteBuffer(Omega, sizeof(Omega));
-  dest.WriteBuffer(Lambda, sizeof(Lambda));
-  dest.WriteBuffer(Frequency, sizeof(Frequency));
-  dest.WriteBuffer(Phase, sizeof(Phase));
-
-  //Translate.SaveToFile(dest);
-  //Scale.SaveToFile(dest);
-  //Rotate.SaveToFile(dest);
-
-  n := ColourMaps.Count;
-
-  dest.WriteBuffer(n, sizeof(n));
-
-  for i := 0 to n - 1 do
-  begin
-    map := ColourMaps[i];
-    //if Assigned(map) then map.SaveToFile(dest);
-  end;
+  obj := TJSONObject.Create;
+  obj.AddPair('name', Name);
+  obj.AddPair('halotype', byte(ord(HaloType)));
+  obj.AddPair('halodensity', byte(ord(HaloDensity)));
+  obj.AddPair('halomapping', byte(ord(HaloMapping)));
+  obj.AddPair('dusttype', byte(ord(DustType)));
+  obj.AddPair('eccentricity', Eccentricity);
+  obj.AddPair('maxvalue', MaxValue);
+  obj.AddPair('exponent', Exponent);
+  obj.AddPair('samples', Samples);
+  obj.AddPair('aalevel', AALevel);
+  obj.AddPair('aathreshold', AAThreshold);
+  obj.AddPair('jitter', Jitter);
+  obj.AddPair('turbelence', Turbulence);
+  obj.AddPair('octaves', Octaves);
+  obj.AddPair('omega', Omega);
+  obj.AddPair('lambda', Lambda);
+  obj.AddPair('frequency', Frequency);
+  obj.AddPair('phase', Phase);
+  colourMapsArray := TJSONArray.Create;
+  for map in ColourMaps do
+    map.Save(colourMapsArray);
+  obj.AddPair('colourmaps', colourMapsArray);
+  parent.Add(obj);
 end;
 
-procedure THalo.LoadFromFile(source: TStream);
+procedure THalo.Load(obj: TJSONObject);
 var
   i, n: integer;
   map: TMapItem;
+  mapArray: TJSONArray;
+  mapObj: TJSONObject;
 
 begin
-  LoadStringFromStream(Name, source);
-
-  source.ReadBuffer(HaloType, sizeof(HaloType));
-  source.ReadBuffer(HaloDensity, sizeof(HaloDensity));
-  source.ReadBuffer(HaloMapping, sizeof(HaloMapping));
-  source.ReadBuffer(DustType, sizeof(DustType));
-  source.ReadBuffer(Eccentricity, sizeof(Eccentricity));
-  source.ReadBuffer(MaxValue, sizeof(MaxValue));
-  source.ReadBuffer(Exponent, sizeof(Exponent));
-  source.ReadBuffer(Samples, sizeof(Samples));
-  source.ReadBuffer(AALevel, sizeof(AALevel));
-  source.ReadBuffer(AAThreshold, sizeof(AAThreshold));
-  source.ReadBuffer(Jitter, sizeof(Jitter));
-  source.ReadBuffer(Turbulence, sizeof(Turbulence));
-  source.ReadBuffer(Octaves, sizeof(Octaves));
-  source.ReadBuffer(Omega, sizeof(Omega));
-  source.ReadBuffer(Lambda, sizeof(Lambda));
-  source.ReadBuffer(Frequency, sizeof(Frequency));
-  source.ReadBuffer(Phase, sizeof(Phase));
-
-  //Translate.LoadFromFile(source);
-  //Scale.LoadFromFile(source);
-  //Rotate.LoadFromFile(source);
-
-  source.ReadBuffer(n, sizeof(n));
-
-  for i := 1 to n do
+  Name := obj.GetValue('name').Value;
+  HaloType := THaloType(obj.GetInteger('halotype'));
+  HaloDensity := THaloDensity(obj.GetInteger('halodensity'));
+  HaloMapping := THaloMapping(obj.GetInteger('halomapping'));
+  DustType := TAtmosphereType(obj.GetInteger('dusttype'));
+  Eccentricity := obj.GetDouble('eccentricity');
+  MaxValue := obj.GetDouble('maxvalue');
+  Exponent := obj.GetDouble('exponent');
+  Samples := obj.GetInteger('samples');
+  AALevel := obj.GetDouble('aalevel');
+  AAThreshold := obj.GetDouble('aathreshold');
+  Jitter := obj.GetDouble('jitter');
+  Turbulence := obj.GetDouble('turbulence');
+  Octaves := obj.GetInteger('octaves');
+  Omega := obj.GetDouble('omega');
+  Lambda := obj.GetDouble('lambda');
+  Frequency := obj.GetInteger('frequency');
+  Phase := obj.GetDouble('phase');
+  mapArray := obj.GetValue('colourmaps') as TJSONArray;
+  n := mapArray.Count;
+  for i := 0 to n - 1 do
   begin
+    mapObj := mapArray.Items[i] as TJSONObject;
     map := TMapItem.Create;
-    map.LoadFromFile(source);
+    map.Load(mapObj);
     ColourMaps.Add(map);
   end;
 end;
@@ -430,6 +437,93 @@ begin
   WriteLn(dest, '        }');
 
   WriteLn(dest, '    }');
+end;
+
+{ THaloManager }
+
+constructor THaloManager.Create;
+begin
+  Halos := TObjectList<THalo>.Create;
+end;
+
+destructor THaloManager.Destroy;
+begin
+  Halos.Free;
+  inherited;
+end;
+
+function THaloManager.FindHalo(const Name: string): THalo;
+var
+  i: integer;
+  halo: THalo;
+
+begin
+  result := nil;
+  for i := 0 to Halos.Count - 1 do
+  begin
+    halo := Halos[i];
+    if halo.Name = Name then
+    begin
+      result := halo;
+      break;
+    end;
+  end;
+end;
+
+class procedure THaloManager.Initialise;
+begin
+  HaloManager := THaloManager.Create;
+end;
+
+procedure THaloManager.LoadHalos(const filename: string);
+var
+  i, n: integer;
+  data: string;
+  halo: THalo;
+  root: TJSONObject;
+  halosArray: TJSONArray;
+  haloObj: TJSONObject;
+
+begin
+  data := TFile.ReadAllText(filename);
+  root := TJSONObject.ParseJSONValue(data, true) as TJSONObject;
+  halosArray := root.Get('halos').JsonValue as TJSONArray;
+  Halos.Clear;
+  n := halosArray.Count;
+  for i := 0 to n - 1 do
+  begin
+    haloObj := halosArray.Items[i] as TJSONObject;
+    halo := THalo.Create;
+    halo.Load(haloObj);
+    Halos.Add(halo);
+  end;
+end;
+
+procedure THaloManager.SaveHalos(const filename: string);
+var
+  i, n: integer;
+  text: string;
+  halo: THalo;
+  root: TJSONObject;
+  scene: TJSONArray;
+
+begin
+  root := TJSONObject.Create;
+  scene := TJSONArray.Create;
+  n := Halos.Count;
+  for i := 0 to n - 1 do
+  begin
+    halo := Halos[i];
+    halo.Save(scene);
+  end;
+  text := root.ToJSON;
+  TFile.WriteAllText(filename, text);
+end;
+
+class procedure THaloManager.Shutdown;
+begin
+  HaloManager.Free;
+  HaloManager := nil;
 end;
 
 end.

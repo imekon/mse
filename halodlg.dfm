@@ -60,6 +60,10 @@ object HaloDialog: THaloDialog
     TabOrder = 1
     object Details: TTabSheet
       Caption = 'Details'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label2: TLabel
         Left = 8
         Top = 16

@@ -109,9 +109,9 @@ var
   halo, newhalo: THalo;
 
 begin
-  for i := 0 to MainForm.Halos.Count - 1 do
+  for i := 0 to THaloManager.HaloManager.Halos.Count - 1 do
   begin
-    halo := MainForm.Halos[i];
+    halo := THaloManager.HaloManager.Halos[i];
     newhalo := THalo.Create;
     newhalo.Copy(halo);
     ListBox.Items.AddObject(halo.Name, newhalo);
@@ -125,18 +125,18 @@ var
 
 begin
   // Clear out stored halos
-  for i := 0 to MainForm.Halos.Count - 1 do
+  for i := 0 to THaloManager.HaloManager.Halos.Count - 1 do
   begin
-    halo := MainForm.Halos[i];
+    halo := THaloManager.HaloManager.Halos[i];
     halo.Free;
   end;
 
-  MainForm.Halos.Clear;
+  THaloManager.HaloManager.Halos.Clear;
 
   for i := 0 to ListBox.Items.Count - 1 do
   begin
     halo := ListBox.Items.Objects[i] as THalo;
-    MainForm.Halos.Add(halo);
+    THaloManager.HaloManager.Halos.Add(halo);
   end;
 end;
 

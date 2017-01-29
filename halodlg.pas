@@ -20,8 +20,11 @@ unit halodlg;
 
 interface
 
-uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
-  Buttons, ExtCtrls, ComCtrls;
+uses
+  Winapi.Windows, System.SysUtils, System.Classes, System.Generics.Collections,
+  VCL.Graphics, VCL.Forms, VCL.Controls, VCL.StdCtrls, VCL.Buttons,
+  VCL.ExtCtrls, VCL.ComCtrls,
+  maptext;
 
 type
   THaloDialog = class(TForm)
@@ -82,8 +85,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure EditMapClick(Sender: TObject);
-    procedure SetMaps(list: TList);
-    procedure GetMaps(list: TList);
+    procedure SetMaps(list: TList<TMapItem>);
+    procedure GetMaps(list: TList<TMapItem>);
   private
     { Private declarations }
   public
@@ -92,7 +95,7 @@ type
     Octaves: Integer;
     Lambda: double;
     Omega: double;
-    Maps: TList;
+    Maps: TList<TMapItem>;
   end;
 
 var
@@ -100,7 +103,7 @@ var
 
 implementation
 
-uses turbulence, maptext, colmap;
+uses turbulence, colmap;
 
 {$R *.DFM}
 
@@ -136,7 +139,7 @@ begin
   Octaves := 6;
   Lambda := 2;
   Omega := 0.5;
-  Maps := TList.Create;
+  Maps := TList<TmapItem>.Create;
 
   bitmap := TBitmap.Create;
   bitmap.Width := MapImage.Width;
@@ -183,7 +186,7 @@ begin
   dlg.Free;
 end;
 
-procedure THaloDialog.SetMaps(list: TList);
+procedure THaloDialog.SetMaps(list: TList<TMapItem>);
 var
   i: integer;
   map, newmap: TMapItem;
@@ -203,7 +206,7 @@ begin
   DrawMap(MapImage.Width, MapImage.Height, MapImage.Canvas, Maps);
 end;
 
-procedure THaloDialog.GetMaps(list: TList);
+procedure THaloDialog.GetMaps(list: TList<TMapItem>);
 var
   i: integer;
   map, newmap: TMapItem;

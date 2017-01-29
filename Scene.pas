@@ -537,6 +537,8 @@ type
     procedure NextFrame;
 
     class function CreateShapeFromID(ID: TShapeID): TShape;
+    class procedure Initialise;
+    class procedure Shutdown;
   end;
 
 const
@@ -3112,6 +3114,12 @@ begin
   Make;
 end;
 
+class procedure TSceneManager.Shutdown;
+begin
+  SceneManager.Free;
+  SceneManager := nil;
+end;
+
 procedure TSceneManager.SetCurrent(shape: TShape);
 begin
   if Current <> nil then
@@ -4584,6 +4592,11 @@ begin
   end;
 end;
 
+class procedure TSceneManager.Initialise;
+begin
+  SceneManager := TSceneManager.Create;
+end;
+
 procedure TSceneManager.CreateGroup(AType: TGroupType);
 var
   i: integer;
@@ -5116,12 +5129,5 @@ begin
   else
     result := 1;
 end;
-
-initialization
-  TSceneManager.SceneManager := TSceneManager.Create;
-
-finalization
-  TSceneManager.SceneManager.Free;
-  TSceneManager.SceneManager := nil;
 
 end.

@@ -22,8 +22,11 @@ interface
 
 uses
   System.UITypes,
-  Windows, SysUtils, Classes, Graphics, Forms, Dialogs, Controls, StdCtrls,
-  Buttons, ExtCtrls, Clipbrd;
+  Winapi.Windows, System.SysUtils, System.Classes, System.Generics.Collections,
+  VCL.Graphics, VCL.Forms,
+  VCL.Dialogs, VCL.Controls, VCL.StdCtrls, VCL.Buttons, VCL.ExtCtrls,
+  VCL.Clipbrd,
+  maptext;
 
 type
   TColourBlock = class
@@ -83,22 +86,22 @@ type
   private
     { Private declarations }
     HoldApply: boolean;
-    Maps: TList;
+    Maps: TList<TMapItem>;
     Selected: integer;
 
     procedure SetScrollBars;
     procedure SetCurrent(index: integer);
   public
     { Public declarations }
-    procedure SetMaps(list: TList);
-    procedure GetMaps(list: TList);
+    procedure SetMaps(list: TList<TMapItem>);
+    procedure GetMaps(list: TList<TMapItem>);
   end;
 
-procedure DrawMap(width, height: integer; canvas: TCanvas; list: TList);
+procedure DrawMap(width, height: integer; canvas: TCanvas; list: TList<TmapItem>);
 
 implementation
 
-uses maptext, rgbft, main;
+uses rgbft, main;
 
 {$R *.DFM}
 
@@ -141,7 +144,7 @@ begin
   HoldApply := False;
   Selected := 0;
 
-  Maps := TList.Create;
+  Maps := TList<TMapItem>.Create;
 
   bitmap := TBitmap.Create;
   bitmap.Width := MapImage.Width;
@@ -220,7 +223,7 @@ begin
   end;
 end;
 
-procedure TColourMapDialog.SetMaps(list: TList);
+procedure TColourMapDialog.SetMaps(list: TList<TMapItem>);
 var
   i: integer;
   map, mapcopy: TMapItem;
@@ -240,7 +243,7 @@ begin
   DrawMap(MapImage.Width, MapImage.Height, MapImage.Canvas, Maps);
 end;
 
-procedure TColourMapDialog.GetMaps(list: TList);
+procedure TColourMapDialog.GetMaps(list: TList<TMapItem>);
 var
   i: integer;
   map, mapcopy: TMapItem;
@@ -446,7 +449,7 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure DrawMap(width, height: integer; canvas: TCanvas; list: TList);
+procedure DrawMap(width, height: integer; canvas: TCanvas; list: TList<TmapItem>);
 var
   flat: boolean;
   i, j, x1, x2, n: integer;

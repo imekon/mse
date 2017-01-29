@@ -21,7 +21,10 @@ unit maptext;
 interface
 
 uses
-  Windows, Classes, SysUtils, Graphics, Forms, Vector, Texture;
+  Winapi.Windows,
+  System.Generics.Collections, System.Classes, System.SysUtils, System.JSON,
+  VCL.Graphics, VCL.Forms,
+  JSONHelper, Vector, Texture;
 
 const
   MapTextSize = 30;
@@ -31,8 +34,8 @@ type
   public
     Red, Green, Blue, Filter, Transmit, Value: double;
     constructor Create;
-    //procedure SaveToFile(dest: TStream);
-    procedure LoadFromFile(source: TStream);
+    procedure Save(parent: TJSONArray);
+    procedure Load(obj: TJSONObject);
     procedure Draw(x: integer; canvas: TCanvas; selected: boolean);
     procedure Copy(original: TMapItem);
     procedure SetRGBV(r, g, b, v: double);
@@ -43,7 +46,7 @@ type
   TMapTexture = class(TTexture)
   public
     MapType: TTextureID;
-    Maps: TList;
+    Maps: TList<TMapItem>;
 
     constructor Create; override;
     destructor Destroy; override;
@@ -82,26 +85,14 @@ begin
   Filter := 0;
 end;
 
-{*
-procedure TMapItem.SaveToFile(dest: TStream);
+procedure TMapItem.Load(obj: TJSONObject);
 begin
-  dest.WriteBuffer(Red, sizeof(Red));
-  dest.WriteBuffer(Green, sizeof(Green));
-  dest.WriteBuffer(Blue, sizeof(Blue));
-  dest.WriteBuffer(Filter, sizeof(Filter));
-  dest.WriteBuffer(Transmit, sizeof(Transmit));
-  dest.WriteBuffer(Value, sizeof(Value));
-end;
-*}
-
-procedure TMapItem.LoadFromFile(source: TStream);
-begin
-  source.ReadBuffer(Red, sizeof(Red));
-  source.ReadBuffer(Green, sizeof(Green));
-  source.ReadBuffer(Blue, sizeof(Blue));
-  source.ReadBuffer(Filter, sizeof(Filter));
-  source.ReadBuffer(Transmit, sizeof(Transmit));
-  source.ReadBuffer(Value, sizeof(Value));
+  Red := obj.GetDouble('red');
+  Green := obj.GetDouble('green');
+  Blue := obj.GetDouble('blue');
+  Filter := obj.GetDouble('filter');
+  Transmit := obj.GetDouble('transmit');
+  Value := obj.GetDouble('value');
 end;
 
 procedure TMapItem.Draw(x: integer; canvas: TCanvas; selected: boolean);
@@ -139,6 +130,21 @@ begin
   Value := v;
 end;
 
+procedure TMapItem.Save(parent: TJSONArray);
+var
+  obj: TJSONObject;
+
+begin
+  obj := TJSONObject.Create;
+  obj.AddPair('red', FloatToStr(Red));
+  obj.AddPair('green', FloatToStr(Green));
+  obj.AddPair('blue', FloatToStr(Blue));
+  obj.AddPair('filter', FloatToStr(Filter));
+  obj.AddPair('transmit', FloatToStr(Transmit));
+  obj.AddPair('value', FloatToStr(Value));
+  parent.Add(obj);
+end;
+
 procedure TMapItem.SetRGBFTV(r, g, b, f, t, v: double);
 begin
   Red := r;
@@ -167,7 +173,7 @@ begin
   Blue := 1;
 
   MapType := tiMap;
-  Maps := TList.Create;
+  Maps := TList<TmapItem>.Create;
 end;
 
 destructor TMapTexture.Destroy;

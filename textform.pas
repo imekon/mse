@@ -21,11 +21,13 @@ unit textform;
 interface
 
 uses
-  System.UITypes, Scene,
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, ExtCtrls, Buttons, ToolWin, Menus,
-  Texture.Manager, Texture, StdCtrls, ImgList, Clipbrd,
-  rgbframe, turbframe, ActnList, System.Actions, System.ImageList;
+  System.UITypes, System.Generics.Collections, Scene,
+  Winapi.Windows, Winapi.Messages,
+  System.SysUtils, System.Classes,
+  VCL.Graphics, VCL.Controls, VCL.Forms, VCL.Dialogs,
+  VCL.ComCtrls, VCL.ExtCtrls, VCL.Buttons, VCL.ToolWin, VCL.Menus,
+  Texture.Manager, Texture, VCL.StdCtrls, VCL.ImgList, VCL.Clipbrd,
+  rgbframe, turbframe, VCL.ActnList, System.Actions, System.ImageList;
 
 type
   TColourMapBlock = class
@@ -253,7 +255,7 @@ begin
   canvas.FillRect(rect);
 end;
 
-procedure DrawColourMap(width, height: integer; canvas: TCanvas; list: TList);
+procedure DrawColourMap(width, height: integer; canvas: TCanvas; list: TList<TMapItem>);
 var
   flat: boolean;
   i, j, x1, x2, n: integer;

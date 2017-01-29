@@ -120,7 +120,8 @@ uses
   env in 'env.pas',
   engine in 'engine.pas',
   envdlg in 'envdlg.pas' {EnvironmentDialog},
-  texture.manager in 'texture.manager.pas';
+  texture.manager in 'texture.manager.pas',
+  JSONHelper in 'JSONHelper.pas';
 
 {$R *.TLB}
 
