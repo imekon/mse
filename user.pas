@@ -38,7 +38,7 @@ type
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure Rebuild;
   end;
 
@@ -129,7 +129,7 @@ begin
   end;
 end;
 
-procedure TUserShape.Details;
+procedure TUserShape.Details(context: IDrawingContext);
 var
   dlg: TUserDialog;
 

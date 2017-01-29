@@ -58,7 +58,7 @@ type
       procedure LoadFromFile(source: TStream); override;
       procedure Generate(var dest: TextFile); override;
       function CreateQuery: boolean; override;
-      procedure Details; override;
+      procedure Details(context: IDrawingContext); override;
       function GetMaximum: double;
       procedure Scaling(scale: double);
       procedure CalculateNormals;
@@ -74,7 +74,7 @@ procedure CreatePolygonExtrusion(shape: TShape; list: TList; steps: integer; dep
 
 implementation
 
-uses Main, Sphere, Solid, Disc, CrePoly, PolyEdit, ExtDlg, engine;
+uses Sphere, Solid, Disc, CrePoly, PolyEdit, ExtDlg, engine;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  TXYPoint
@@ -251,7 +251,7 @@ begin
   WriteLn(dest, '}');
 end;
 
-procedure TPolygon.Details;
+procedure TPolygon.Details(context: IDrawingContext);
 begin
   PolyEditor.SetPolygon(Self);
 end;

@@ -96,7 +96,7 @@ type
     function GetID: TShapeID; override;
     procedure Generate(var dest: TextFile); override;
     procedure GenerateVRML(var dest: TextFile); override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
   end;
@@ -104,7 +104,7 @@ type
 implementation
 
 uses
-  misc, main, Light, scrdlg;
+  misc, Light, scrdlg;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -347,7 +347,7 @@ begin
   end;
 end;
 
-procedure TScripted.Details;
+procedure TScripted.Details(context: IDrawingContext);
 var
   dlg: TScriptedDialog;
 

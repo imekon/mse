@@ -24,7 +24,7 @@ uses
   Winapi.Windows, System.SysUtils, System.Classes, System.Generics.Collections,
   VCL.Graphics, VCL.Forms, VCL.Controls, VCL.StdCtrls, VCL.Buttons,
   VCL.ExtCtrls, VCL.ComCtrls,
-  maptext;
+  maptext, scene;
 
 type
   THaloDialog = class(TForm)
@@ -89,6 +89,7 @@ type
     procedure GetMaps(list: TList<TMapItem>);
   private
     { Private declarations }
+    DrawingContext: IDrawingContext;
   public
     { Public declarations }
     Turbulence: double;
@@ -96,6 +97,8 @@ type
     Lambda: double;
     Omega: double;
     Maps: TList<TMapItem>;
+
+    procedure SetDrawingContext(context: IDrawingContext);
   end;
 
 var
@@ -135,6 +138,8 @@ var
   bitmap: TBitmap;
 
 begin
+  DrawingContext := nil;
+
   Turbulence := 0;
   Octaves := 6;
   Lambda := 2;
@@ -174,6 +179,7 @@ var
 begin
   dlg := TColourMapDialog.Create(Application);
 
+  dlg.SetDrawingContext(DrawingContext);
   dlg.SetMaps(Maps);
 
   if dlg.ShowModal = idOK then
@@ -184,6 +190,11 @@ begin
   end;
 
   dlg.Free;
+end;
+
+procedure THaloDialog.SetDrawingContext(context: IDrawingContext);
+begin
+  DrawingContext := context;
 end;
 
 procedure THaloDialog.SetMaps(list: TList<TMapItem>);

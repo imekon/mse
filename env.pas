@@ -31,7 +31,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
     function GetID: TShapeID; override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
   end;
 
 implementation
@@ -55,7 +55,7 @@ begin
   result := siEnvironment;
 end;
 
-procedure TEnvironment.Details;
+procedure TEnvironment.Details(context: IDrawingContext);
 var
   dlg: TEnvironmentDialog;
 

@@ -206,6 +206,7 @@ type
     SelectedMap: integer;
     NoPreview: TBitmap;
     TextureFolder: TIcon;
+    DrawingContext: IDrawingContext;
 
     function CreateTexture(ATexture: TTextureType): TTexture;
     function CreateMapTexture(AType: TTextureID): TTexture;
@@ -229,6 +230,7 @@ type
     procedure GetFinishSheet;
   public
     { Public declarations }
+    procedure SetDrawingContext(context: IDrawingContext);
   end;
 
 var
@@ -236,7 +238,8 @@ var
 
 implementation
 
-uses main, texttype, chtextnm, brick, checker, hexagon, maptext, rgbft,
+uses
+  texttype, chtextnm, brick, checker, hexagon, maptext, rgbft,
   misc, parser;
 
 {$R *.DFM}
@@ -489,8 +492,8 @@ begin
     if texture <> nil then
     begin
       TTextureManager.TextureManager.Textures.Add(texture);
-      MainForm.TextPaintBox.Width := TTextureManager.TextureManager.Textures.Count * TextSize;
-      MainForm.TextPaintBox.Refresh;
+      DrawingContext.SetTextureWidth(TTextureManager.TextureManager.Textures.Count * TextSize);
+      DrawingContext.RefreshTexture;
 
       node := AddTexture(texture);
       TextureList.Selected := node;
@@ -845,6 +848,11 @@ begin
   ApplyBtn.Enabled := true;
 end;
 
+procedure TTextureForm.SetDrawingContext(context: IDrawingContext);
+begin
+  DrawingContext := context;
+end;
+
 procedure TTextureForm.ApplyBtnClick(Sender: TObject);
 begin
   if CurrentTexture <> nil then
@@ -1078,7 +1086,7 @@ begin
     Clipboard.Open;
 
     // Move the global buffer into the clipboard
-    Clipboard.SetAsHandle(MainForm.ColourClipForm, handle);
+    Clipboard.SetAsHandle(DrawingContext.GetColourClipFormat, handle);
 
     // Put text in as well
     Clipboard.AsText := 'Map';
@@ -1105,13 +1113,13 @@ begin
   begin
     MapTexture := CurrentTexture as TMapTexture;
 
-    if Clipboard.HasFormat(MainForm.ColourClipForm) then
+    if Clipboard.HasFormat(DrawingContext.GetColourClipFormat) then
     begin
       // Open the clipboard
       Clipboard.Open;
 
       // Get the handle of the shape on the clipboard
-      handle := Clipboard.GetAsHandle(MainForm.ColourClipForm);
+      handle := Clipboard.GetAsHandle(DrawingContext.GetColourClipFormat);
 
       // Get the size of the shape
       size := GlobalSize(handle);
@@ -1254,12 +1262,12 @@ begin
     CurrentTexture.Preview(dest, Shape.ItemIndex, Floor.Checked, Wall.Checked, FloorColour.Brush.Color, WallColour.Brush.Color);
     CloseFile(dest);
 
-    command := MainForm.POVCommand +
+    command := DrawingContext.GetPOVCommand +
       ' +w160 +h120 +fs +b +ipreview.pov +o' +
       GetTexturesDirectory() + '\' +
       CurrentTexture.Name + '.bmp';
 
-    if LowerCase(ExtractFileName(MainForm.POVCommand)) = 'pvengine.exe' then
+    if LowerCase(ExtractFileName(DrawingContext.GetPOVCommand)) = 'pvengine.exe' then
       command := command + ' /EXIT';
 
     WinExecAndWait32(command, SW_HIDE);
@@ -1385,8 +1393,8 @@ begin
         else
           user.Free;
       end;
-      MainForm.TextPaintBox.Width := TTextureManager.TextureManager.Textures.Count * TextSize;
-      MainForm.TextPaintBox.Refresh;
+      DrawingContext.SetTextureWidth(TTextureManager.TextureManager.Textures.Count * TextSize);
+      DrawingContext.RefreshTexture;
     finally
       source.Free;
     end;

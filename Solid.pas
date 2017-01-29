@@ -51,7 +51,7 @@ type
     procedure Generate(var dest: TextFile); override;
     procedure GenerateVRML(var dest: TextFile); override;
     procedure GenerateBlob(var dest: TextFile); override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure Rebuild;
     procedure CreateCone;
     procedure CreateCylinder;
@@ -72,7 +72,7 @@ type
     procedure SaveToFile(dest: TStream); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure CreateLathe;
     procedure Rebuild;
   end;
@@ -84,7 +84,7 @@ const
 implementation
 
 uses
-  Main, Sphere, SolidEdit, Lathedit;
+  Sphere, SolidEdit, Lathedit;
 
 ////////////////////////////////////////////////////////////////////////////////
 // SOLIDPOINT
@@ -653,7 +653,7 @@ begin
   Rebuild;
 end;
 
-procedure TSolid.Details;
+procedure TSolid.Details(context: IDrawingContext);
 begin
   SolidEditor.SetSolid(Self);
 end;
@@ -963,7 +963,7 @@ begin
 end;
 {$ENDIF}
 
-procedure TLathe.Details;
+procedure TLathe.Details(context: IDrawingContext);
 begin
   LatheEditor.SetLathe(Self);
 end;

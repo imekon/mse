@@ -56,17 +56,20 @@ type
     ColourMaps: TObjectList<TMapItem>;
 
     constructor Create;
+
     destructor Destroy; override;
     procedure ClearMaps;
     procedure Save(parent: TJSONArray);
     procedure Load(obj: TJSONObject);
     procedure Generate(var dest: TextFile);
-    function Edit: boolean;
+    function Edit(context: IDrawingContext): boolean;
     procedure CreateSimple;
     procedure Copy(original: THalo);
   end;
 
   THaloManager = class
+  private
+    Modified: boolean;
   public
     Halos: TObjectList<THalo>;
     class var HaloManager: THaloManager;
@@ -75,6 +78,8 @@ type
     function FindHalo(const Name: string): THalo;
     procedure LoadHalos(const filename: string);
     procedure SaveHalos(const filename: string);
+
+    property IsModified: boolean read Modified write Modified;
 
     class procedure Initialise;
     class procedure Shutdown;
@@ -211,12 +216,14 @@ begin
   end;
 end;
 
-function THalo.Edit: boolean;
+function THalo.Edit(context: IDrawingContext): boolean;
 var
   dlg: THaloDialog;
 
 begin
   dlg := THaloDialog.Create(Application);
+
+  dlg.SetDrawingContext(context);
 
   dlg.Name.Text := Name;
 
@@ -443,6 +450,7 @@ end;
 
 constructor THaloManager.Create;
 begin
+  Modified := false;
   Halos := TObjectList<THalo>.Create;
 end;
 
@@ -497,6 +505,7 @@ begin
     halo.Load(haloObj);
     Halos.Add(halo);
   end;
+  Modified := false;
 end;
 
 procedure THaloManager.SaveHalos(const filename: string);
@@ -518,6 +527,7 @@ begin
   end;
   text := root.ToJSON;
   TFile.WriteAllText(filename, text);
+  Modified := false;
 end;
 
 class procedure THaloManager.Shutdown;

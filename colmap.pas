@@ -26,7 +26,7 @@ uses
   VCL.Graphics, VCL.Forms,
   VCL.Dialogs, VCL.Controls, VCL.StdCtrls, VCL.Buttons, VCL.ExtCtrls,
   VCL.Clipbrd,
-  maptext;
+  maptext, scene;
 
 type
   TColourBlock = class
@@ -88,11 +88,13 @@ type
     HoldApply: boolean;
     Maps: TList<TMapItem>;
     Selected: integer;
+    DrawingContext: IDrawingContext;
 
     procedure SetScrollBars;
     procedure SetCurrent(index: integer);
   public
     { Public declarations }
+    procedure SetDrawingContext(context: IDrawingContext);
     procedure SetMaps(list: TList<TMapItem>);
     procedure GetMaps(list: TList<TMapItem>);
   end;
@@ -101,7 +103,7 @@ procedure DrawMap(width, height: integer; canvas: TCanvas; list: TList<TmapItem>
 
 implementation
 
-uses rgbft, main;
+uses rgbft;
 
 {$R *.DFM}
 
@@ -141,6 +143,8 @@ var
   bitmap: TBitmap;
 
 begin
+  DrawingContext := nil;
+
   HoldApply := False;
   Selected := 0;
 
@@ -293,6 +297,11 @@ begin
   HoldApply := False;
 
   SetScrollBars;
+end;
+
+procedure TColourMapDialog.SetDrawingContext(context: IDrawingContext);
+begin
+  DrawingContext := context;
 end;
 
 procedure TColourMapDialog.AddBtnClick(Sender: TObject);
@@ -681,7 +690,7 @@ begin
   Clipboard.Open;
 
   // Move the global buffer into the clipboard
-  Clipboard.SetAsHandle(MainForm.ColourClipForm, handle);
+  Clipboard.SetAsHandle(DrawingContext.GetColourClipFormat, handle);
 
   // Put text in as well
   Clipboard.AsText := 'Map';
@@ -702,13 +711,13 @@ var
   size: DWORD;
 
 begin
-  if Clipboard.HasFormat(MainForm.ColourClipForm) then
+  if Clipboard.HasFormat(DrawingContext.GetColourClipFormat) then
   begin
     // Open the clipboard
     Clipboard.Open;
 
     // Get the handle of the shape on the clipboard
-    handle := Clipboard.GetAsHandle(MainForm.ColourClipForm);
+    handle := Clipboard.GetAsHandle(DrawingContext.GetColourClipFormat);
 
     // Get the size of the shape
     size := GlobalSize(handle);

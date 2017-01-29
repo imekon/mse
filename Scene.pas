@@ -62,6 +62,15 @@ type
   TShape = class;
   TSceneManager = class;
 
+  IDrawingContext = interface
+    function GetColourClipFormat: UINT;
+    function GetPOVCommand: string;
+    procedure RefreshMain;
+    procedure RefreshTexture;
+    procedure Modify(shape: TShape);
+    procedure SetTextureWidth(width: integer);
+  end;
+
   // A vector object with support routines
   TCoord = class(TVector)
     public
@@ -254,7 +263,7 @@ type
       procedure GenerateDirectXFile(var dest: TextFile; const Options: TExportOptions); virtual;
       procedure GenerateBlob(var dest: TextFile); virtual;
       function CreateQuery: boolean; virtual;
-      procedure Details; virtual;
+      procedure Details(context: IDrawingContext); virtual;
       procedure Copy(original: TShape); virtual;
       function BuildTree(tree: TTreeView; node: TTreeNode): TTreeNode; virtual;
       procedure GetNormal;
@@ -289,7 +298,7 @@ type
     procedure Generate(var dest: TextFile); override;
     procedure GenerateVRML(var dest: TextFile); override;
     procedure GenerateCoolRay(var dest: TextFile); override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure CalculateAngle;
   end;
 
@@ -2214,7 +2223,7 @@ begin
 end;
 *}
 
-procedure TShape.Details;
+procedure TShape.Details(context: IDrawingContext);
 begin
 end;
 
@@ -2564,7 +2573,7 @@ begin
 {$ENDIF}
 end;
 
-procedure TCamera.Details;
+procedure TCamera.Details(context: IDrawingContext);
 var
   dlg: TCameraDialog;
 
@@ -2594,7 +2603,7 @@ begin
     if TSceneManager.SceneManager.GetView = vwCamera then
       TSceneManager.SceneManager.Make;
 
-    MainForm.MainPaintBox.Refresh;
+    context.RefreshMain;
   end;
 
   dlg.Free;

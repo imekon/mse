@@ -60,7 +60,7 @@ type
     procedure Clear;
     procedure Copy(original: TShape); override;
     function BuildTree(tree: TTreeView; node: TTreeNode): TTreeNode; override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure MakeFirst(shape: TShape);
   end;
 
@@ -77,7 +77,7 @@ type
 implementation
 
 uses
-  main, grpedit;
+  grpedit;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  TGroupShape
@@ -398,7 +398,7 @@ begin
 end;
 {$ENDIF}
 
-procedure TGroupShape.Details;
+procedure TGroupShape.Details(context: IDrawingContext);
 begin
   GroupEditor.SetGroup(Self);
 end;

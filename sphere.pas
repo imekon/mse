@@ -36,7 +36,7 @@ type
     procedure GenerateBlob(var dest: TextFile); override;
     procedure GenerateVRML(var dest: TextFile); override;
     procedure GenerateCoolRay(var dest: TextFile); override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure LoadFromFile(source: TStream); override;
     procedure SaveToFile(dest: TStream); override;
     procedure Build;
@@ -44,7 +44,7 @@ type
 
 implementation
 
-uses Solid, main, spheredlg, engine;
+uses Solid, spheredlg, engine;
 
 constructor TSphere.Create;
 begin
@@ -119,7 +119,7 @@ begin
   end;
 end;
 
-procedure TSphere.Details;
+procedure TSphere.Details(context: IDrawingContext);
 var
   dlg: TSphereDialog;
 
@@ -136,7 +136,7 @@ begin
 
     Build;
 
-    MainForm.Modify(Self);
+    context.Modify(Self);
   end;
 
   dlg.Free;

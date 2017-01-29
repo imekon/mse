@@ -34,7 +34,7 @@ type
     constructor Create; override;
     function GetID: TShapeID; override;
     procedure Generate(var dest: TextFile); override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
@@ -44,7 +44,7 @@ type
 implementation
 
 uses
-  Main, Engine, Solid, TorusDlg;
+  Engine, Solid, TorusDlg;
 
 constructor TTorus.Create;
 begin
@@ -73,7 +73,7 @@ begin
   WriteLn(dest);
 end;
 
-procedure TTorus.Details;
+procedure TTorus.Details(context: IDrawingContext);
 var
   dlg: TTorusDialog;
   m1, m2: double;
@@ -97,7 +97,7 @@ begin
 
       Build;
 
-      MainForm.Modify(Self);
+      context.Modify(Self);
     end
     else
       MessageDlg('Major must be greater than Minor', mtError, [mbOK], 0);

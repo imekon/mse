@@ -34,7 +34,7 @@ type
     constructor Create; override;
     function GetID: TShapeID; override;
     procedure Generate(var dest: TextFile); override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure LoadFromFile(source: TStream); override;
     procedure Save(parent: TJSONArray); override;
     procedure SaveToFile(dest: TStream); override;
@@ -44,7 +44,7 @@ type
 implementation
 
 uses
-  Main, Misc, Sphere, discdlg, engine;
+  Misc, Sphere, discdlg, engine;
 
 constructor TDisc.Create;
 begin
@@ -73,7 +73,7 @@ begin
   WriteLn(dest);
 end;
 
-procedure TDisc.Details;
+procedure TDisc.Details(context: IDrawingContext);
 var
   r, h: double;
   dlg: TDiscDialog;
@@ -96,7 +96,7 @@ begin
 
       Build;
 
-      MainForm.Modify(Self);
+      context.Modify(Self);
     end
     else
       MessageDlg('Radius must be larger than Hole', mtError, [mbOK], 0);

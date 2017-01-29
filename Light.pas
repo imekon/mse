@@ -52,7 +52,7 @@ type
       procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
-      procedure Details; override;
+      procedure Details(context: IDrawingContext); override;
       procedure DetailsLight(dlg: TLightEditorDlg; save: boolean);
       procedure Build;
     end;
@@ -72,7 +72,7 @@ type
       procedure GenerateLight(var dest: TextFile); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
-      procedure Details; override;
+      procedure Details(context: IDrawingContext); override;
     end;
 
   TCylinderLight = class(TSpotLight)
@@ -91,14 +91,14 @@ type
       procedure GenerateLight(var dest: TextFile); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
-      procedure Details; override;
+      procedure Details(context: IDrawingContext); override;
     end;
 
   procedure CreateLight(shape: TShape; x, y, z: double);
 
 implementation
 
-uses Main, Plane, Sphere, Solid, engine;
+uses Plane, Sphere, Solid, engine;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TLight
@@ -293,7 +293,7 @@ begin
   end;
 end;
 
-procedure TLight.Details;
+procedure TLight.Details(context: IDrawingContext);
 var
   dlg: TLightEditorDlg;
 
@@ -306,7 +306,7 @@ begin
   begin
     DetailsLight(dlg, True);
     Build;
-    MainForm.Modify(Self);
+    context.Modify(Self);
   end;
 
   dlg.Free;
@@ -432,7 +432,7 @@ begin
   source.ReadBuffer(Tightness, sizeof(Tightness));
 end;
 
-procedure TSpotLight.Details;
+procedure TSpotLight.Details(context: IDrawingContext);
 var
   dlg: TSpotLightEditorDlg;
 
@@ -523,7 +523,7 @@ begin
   source.ReadBuffer(Jitter, sizeof(Jitter));
 end;
 
-procedure TAreaLight.Details;
+procedure TAreaLight.Details(context: IDrawingContext);
 var
   dlg: TAreaLightEditorDlg;
 

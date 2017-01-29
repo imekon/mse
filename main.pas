@@ -21,12 +21,14 @@ unit main;
 interface
 
 uses
-  System.UITypes, System.Contnrs, System.IOUtils, System.JSON, System.Generics.Collections,
+  System.UITypes, System.Contnrs, System.IOUtils, System.JSON,
+  System.Generics.Collections,
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, VCL.Graphics,
   VCL.Forms, VCL.Controls, VCL.Menus,
   VCL.Dialogs, VCL.StdCtrls, VCL.Buttons, VCL.ExtCtrls, VCL.ComCtrls,
   System.Win.Registry, Texture, Texture.Manager, Halo, VCL.Tabs,
-  Scene, VCL.ToolWin, VCL.ImgList, VCL.ActnList, System.ImageList, System.Actions;
+  Scene, VCL.ToolWin, VCL.ImgList, VCL.ActnList, System.ImageList,
+  System.Actions;
 
 {$INCLUDE DirectX.inc}
 
@@ -433,7 +435,7 @@ type
     CurrentTexture: TTexture;
     NewSceneFile: boolean;
     Filename: string;
-    ModifiedTextures: boolean;
+    DrawingContext: IDrawingContext;
 
     function TextureHitTest(X: integer): TTexture;
     function QueryModified: boolean;
@@ -447,7 +449,6 @@ type
     procedure SetCaption(const Name: string);
   public
     { Public declarations }
-    ModifiedHalos: boolean;
     Palette: HPALETTE;
     ClipForm, PolygonClipForm, ColourClipForm: UINT;
     POVCommand, POVimageSize, CoolRayCommand: string;
@@ -462,7 +463,21 @@ type
     procedure BuildTextureList(list: TComboBox);
     function CreateGallery: TShape;
     procedure Modify(shape: TShape);
+    function GetColourClipFormat: UINT;
     function GetPOVrayCommandString(const OutputFile: string; Width, Height, OutputType: integer; Wait: boolean): string;
+  end;
+
+  TMainFormDrawingContext = class(TInterfacedObject, IDrawingContext)
+  private
+    MainForm: TMainForm;
+  public
+    constructor Create(main: TMainForm);
+    function GetColourClipFormat: UINT;
+    function GetPOVCommand: string;
+    procedure RefreshMain;
+    procedure RefreshTexture;
+    procedure Modify(shape: TShape);
+    procedure SetTextureWidth(width: integer);
   end;
 
 var
@@ -719,11 +734,10 @@ begin
   reg.Free;
 
   TextureVersion := ModelVersion;
+  DrawingContext := TMainFormDrawingContext.Create(self);
   THaloManager.Initialise;
   TTextureManager.Initialise;
   TSceneManager.Initialise;
-  ModifiedHalos := false;
-  ModifiedTextures := False;
 
   ObjectGallery := TList<TShape>.Create;
 
@@ -869,7 +883,7 @@ end;
 function TMainForm.QueryModified: boolean;
 begin
   result := False;
-  if ModifiedHalos or ModifiedTextures or TSceneManager.SceneManager.IsModified then
+  if THaloManager.HaloManager.IsModified or TTextureManager.TextureManager.IsModified or TSceneManager.SceneManager.IsModified then
   begin
     case MessageDlg('Do you wish to save your changes first?', mtConfirmation, [mbYes, mbNo, mbCancel], 0) of
       mrYes:
@@ -893,7 +907,7 @@ begin
           end;
         end;
 
-        if ModifiedHalos then
+        if THaloManager.HaloManager.IsModified then
           THaloManager.HaloManager.SaveHalos('halos.mhf');
 
         if TTextureManager.TextureManager.IsModified then
@@ -1520,7 +1534,7 @@ var
 begin
   shape := TSceneManager.SceneManager.GetCurrent;
   if shape <> nil then
-    shape.Details;
+    shape.Details(DrawingContext);
 end;
 
 procedure TMainForm.InfoBtnClick(Sender: TObject);
@@ -1619,6 +1633,11 @@ procedure TMainForm.PasteItemClick(Sender: TObject);
 begin
   TSceneManager.SceneManager.Paste(False);
   MainPaintBox.Refresh;
+end;
+
+function TMainForm.GetColourClipFormat: UINT;
+begin
+  result := ColourClipForm;
 end;
 
 function TMainForm.GetPOVrayCommandString(const OutputFile: string; Width, Height, OutputType: integer; Wait: boolean): string;
@@ -2173,9 +2192,8 @@ var
 
 begin
   dlg := THalosDialog.Create(Application);
-
+  dlg.SetDrawingContext(DrawingContext);
   dlg.ShowModal;
-
   dlg.Free;
 end;
 
@@ -2391,6 +2409,43 @@ end;
 procedure TMainForm.PlayActionExecute(Sender: TObject);
 begin
   AnimationTimer.Enabled := true;
+end;
+
+{ TMainFormDrawingContext }
+
+constructor TMainFormDrawingContext.Create(main: TMainForm);
+begin
+  MainForm := main;
+end;
+
+function TMainFormDrawingContext.GetColourClipFormat: UINT;
+begin
+  result := MainForm.GetColourClipFormat;
+end;
+
+function TMainFormDrawingContext.GetPOVCommand: string;
+begin
+  result := MainForm.POVCommand;
+end;
+
+procedure TMainFormDrawingContext.Modify(shape: TShape);
+begin
+  MainForm.Modify(shape);
+end;
+
+procedure TMainFormDrawingContext.RefreshMain;
+begin
+  MainForm.MainPaintBox.Refresh;
+end;
+
+procedure TMainFormDrawingContext.RefreshTexture;
+begin
+  MainForm.TextPaintBox.Refresh;
+end;
+
+procedure TMainFormDrawingContext.SetTextureWidth(width: integer);
+begin
+  MainForm.TextPaintBox.Width := width;
 end;
 
 end.

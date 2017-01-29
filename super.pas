@@ -14,7 +14,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //
 
-// Author: Pete Goodwin (pgoodwin@blueyonder.co.uk)
+// Author: Pete Goodwin (mse@imekon.org)
 
 unit super;
 
@@ -34,7 +34,7 @@ type
       constructor Create; override;
       function GetID: TShapeID; override;
       procedure Generate(var dest: TextFile); override;
-      procedure Details; override;
+      procedure Details(context: IDrawingContext); override;
       procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
@@ -67,7 +67,7 @@ begin
   WriteLn(dest);
 end;
 
-procedure TSuperEllipsoid.Details;
+procedure TSuperEllipsoid.Details(context: IDrawingContext);
 var
   dlg: TSuperDialog;
 

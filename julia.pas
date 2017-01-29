@@ -48,7 +48,7 @@ type
       procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
-      procedure Details; override;
+      procedure Details(context: IDrawingContext); override;
     end;
 
 implementation
@@ -194,7 +194,7 @@ begin
   source.ReadBuffer(SliceDistance, sizeof(SliceDistance));
 end;
 
-procedure TJuliaFractal.Details;
+procedure TJuliaFractal.Details(context: IDrawingContext);
 var
   dlg: TJuliaDialog;
 

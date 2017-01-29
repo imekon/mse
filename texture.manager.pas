@@ -3,8 +3,8 @@ unit texture.manager;
 interface
 
 uses
-  System.IOUtils, System.JSON, System.SysUtils, System.Generics.Collections, misc, Texture,
-  System.Classes;
+  System.Classes, System.IOUtils, System.JSON, System.SysUtils,
+  System.Generics.Collections, misc, Texture;
 
 type
   TTextureManager = class

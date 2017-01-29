@@ -23,7 +23,7 @@ interface
 uses
   System.UITypes,
   Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, Dialogs;
+  Buttons, ExtCtrls, Dialogs, halo, scene;
 
 type
   THalosDialog = class(TForm)
@@ -39,13 +39,13 @@ type
     procedure OKBtnClick(Sender: TObject);
   private
     { Private declarations }
+    DrawingContext: IDrawingContext;
   public
     { Public declarations }
+    procedure SetDrawingContext(context: IDrawingContext);
   end;
 
 implementation
-
-uses halo, main;
 
 {$R *.DFM}
 
@@ -59,8 +59,8 @@ begin
     halo := ListBox.Items.Objects[ListBox.ItemIndex] as THalo;
     if Assigned(halo) then
     begin
-      if halo.Edit then
-        MainForm.ModifiedHalos := true;
+      if halo.Edit(DrawingContext) then
+        THaloManager.HaloManager.IsModified := true;
     end;
   end;
 end;
@@ -75,10 +75,10 @@ begin
   halo.Name := 'Halo' + IntToStr(ListBox.Items.Count + 1);
   halo.CreateSimple;
 
-  if halo.Edit then
+  if halo.Edit(DrawingContext) then
   begin
     ListBox.Items.AddObject(halo.Name, halo);
-    MainForm.ModifiedHalos := true;
+    THaloManager.HaloManager.IsModified := true;
   end
   else
     halo.Free;
@@ -97,7 +97,7 @@ begin
       if Assigned(halo) then
       begin
         ListBox.Items.Delete(ListBox.ItemIndex);
-        MainForm.ModifiedHalos := true;
+        THaloManager.HaloManager.IsModified := true;
         halo.Free;
       end;
     end;
@@ -109,6 +109,8 @@ var
   halo, newhalo: THalo;
 
 begin
+  DrawingContext := nil;
+
   for i := 0 to THaloManager.HaloManager.Halos.Count - 1 do
   begin
     halo := THaloManager.HaloManager.Halos[i];
@@ -138,6 +140,11 @@ begin
     halo := ListBox.Items.Objects[i] as THalo;
     THaloManager.HaloManager.Halos.Add(halo);
   end;
+end;
+
+procedure THalosDialog.SetDrawingContext(context: IDrawingContext);
+begin
+  DrawingContext := context;
 end;
 
 end.

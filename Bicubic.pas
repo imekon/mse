@@ -71,7 +71,7 @@ type
     procedure LoadFromFile(source: TStream); override;
     procedure Generate(var dest: TextFile); override;
     function CreateQuery: boolean; override;
-    procedure Details; override;
+    procedure Details(context: IDrawingContext); override;
     procedure Build;
   end;
 
@@ -564,7 +564,7 @@ begin
   WriteLn(dest);
 end;
 
-procedure TBicubicShape.Details;
+procedure TBicubicShape.Details(context: IDrawingContext);
 begin
   BicubicEditor.SetBicubic(Self);
 end;

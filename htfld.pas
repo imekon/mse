@@ -42,7 +42,7 @@ type
       procedure Save(parent: TJSONArray); override;
       procedure SaveToFile(dest: TStream); override;
       procedure LoadFromFile(source: TStream); override;
-      procedure Details; override;
+      procedure Details(context: IDrawingContext); override;
     end;
 
 implementation
@@ -135,7 +135,7 @@ begin
   WriteLn(dest);
 end;
 
-procedure THeightField.Details;
+procedure THeightField.Details(context: IDrawingContext);
 var
   dlg: THeightFieldDialog;
   ext: string;
