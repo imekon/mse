@@ -28,7 +28,7 @@ uses
   VCL.Graphics,
   VCL.Controls, VCL.Forms, VCL.Dialogs,
   VCL.ComCtrls, VCL.Clipbrd,
-  Vector, Texture.Manager, Texture, Matrix;
+  JSONHelper, Vector, Texture.Manager, Texture, Matrix;
 
 const
   d2r = pi / 180.0;
@@ -62,6 +62,7 @@ type
   TShape = class;
   TSceneManager = class;
 
+  // Separate MainForm from data classes
   IDrawingContext = interface
     function GetColourClipFormat: UINT;
     function GetPOVCommand: string;
@@ -125,8 +126,7 @@ type
       procedure DrawFilled(scene: TSceneManager; canvas: TCanvas);
       procedure DrawPolygon(scene: TSceneManager; canvas: TCanvas; view: TView);
       procedure Save(const name: string; parent: TJSONArray);
-      procedure SaveToFile(dest: TStream);
-      procedure LoadFromFile(source: TStream);
+      procedure Load(const name: string; obj: TJSONObject);
       function HasAllSelected: boolean;
       procedure GetNormal;
       procedure GetCenter;
@@ -1171,32 +1171,49 @@ begin
   for i := 1 to 3 do
   begin
     child := TJSONObject.Create;
-    Points[i].Save(name + IntToStr(i + 1), child);
+    Points[i].Save(name + IntToStr(i), child);
     parent.Add(child);
   end;
 end;
 
+{*
 procedure TTriangle.SaveToFile(dest: TStream);
 var
   i: integer;
 
 begin
-{*
   for i := 1 to 3 do
     Points[i].SaveToFile(dest);
+end;
 *}
+
+procedure TTriangle.Load(const name: string; obj: TJSONObject);
+var
+  i: integer;
+  coord: TCoord;
+  child: TJSONObject;
+
+begin
+
+  for i := 1 to 3 do
+  begin
+    child := obj.GetValue(name + IntToStr(i)) as TJSONObject;
+    coord := TCoord.Create;
+    coord.Load(child);
+    Points[i] := coord;
+  end;
 end;
 
+{*
 procedure TTriangle.LoadFromFile(source: TStream);
 var
   i: integer;
 
 begin
-{*
   for i := 1 to 3 do
     Points[i].LoadFromFile(source);
-*}
 end;
+*}
 
 function TTriangle.HasAllSelected: boolean;
 var
@@ -1745,10 +1762,12 @@ begin
   obj.AddPair('type', TJSONNumber.Create(ord(t)));
   obj.AddPair('name', Name);
   obj.AddPair('flags', TJSONNumber.Create(Byte(Flags)));
+
   if assigned(texture) then
     obj.AddPair('texture', texture.Name)
   else
     obj.AddPair('texture', 'unknown');
+
   if assigned(layer) then
     obj.AddPair('layer', layer.Name)
   else

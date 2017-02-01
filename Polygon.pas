@@ -54,8 +54,8 @@ type
       constructor Create; override;
       function GetID: TShapeid; override;
       procedure Save(parent: TJSONArray); override;
-      procedure SaveToFile(dest: TStream); override;
-      procedure LoadFromFile(source: TStream); override;
+      //procedure SaveToFile(dest: TStream); override;
+      //procedure LoadFromFile(source: TStream); override;
       procedure Generate(var dest: TextFile); override;
       function CreateQuery: boolean; override;
       procedure Details(context: IDrawingContext); override;
@@ -149,6 +149,7 @@ begin
   parent.Add(obj);
 end;
 
+{*
 procedure TPolygon.SaveToFile(dest: TStream);
 var
   i: integer;
@@ -193,6 +194,7 @@ begin
   if TSceneManager.SceneManager.FileVersion > 7 then
     source.ReadBuffer(SmoothShaded, sizeof(SmoothShaded));
 end;
+*}
 
 procedure TPolygon.Generate(var dest: TextFile);
 var

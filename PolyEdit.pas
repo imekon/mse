@@ -21,7 +21,7 @@ unit PolyEdit;
 interface
 
 uses
-  System.Contnrs, System.UITypes, System.Types,
+  System.Contnrs, System.UITypes, System.Types, System.JSON,
   Windows, Messages, SysUtils, Math, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, Tabs, StdCtrls, Menus, Clipbrd, Vector, Scene, Polygon, Buttons,
   ToolWin, ComCtrls;
@@ -788,14 +788,18 @@ begin
 end;
 
 procedure TPolyEditor.CopyTriangles;
+{*
 var
   i, n: integer;
   triangle: TTriangle;
-  mem: TMemoryStream;
+  data: string;
+  triangleArray: TJSONArray;
   handle: HGLOBAL;
   ptr: Pointer;
+*}
 
 begin
+{*
   n := 0;
 
   for i := 0 to Polygon.Triangles.Count - 1 do
@@ -805,22 +809,18 @@ begin
       inc(n);
   end;
 
-  // Create a memory stream
-  mem := TMemoryStream.Create;
-
-  // Write the number of polygons we're about to copy to the clipboard
-  mem.WriteBuffer(n, sizeof(n));
-
+  triangleArray := TJSONArray.Create;
   // Copy the triangles to the memory file
   for i := 0 to Polygon.Triangles.Count - 1 do
   begin
     triangle := Polygon.Triangles[i] as TTriangle;
     if triangle.HasAllSelected then
-      triangle.SaveToFile(mem);
+      triangle.Save('copy', triangleArray);
   end;
+  data := triangle.ToString;
 
   // Get a global handle
-  handle := GlobalAlloc(ghnd, mem.Size);
+  handle := GlobalAlloc(ghnd, Length(data));
 
   // Get the pointer
   ptr := GlobalLock(handle);
@@ -842,6 +842,7 @@ begin
 
   // Release the memory stream
   mem.Free;
+*}
 end;
 
 procedure TPolyEditor.DeleteTriangles;
@@ -882,14 +883,17 @@ begin
 end;
 
 procedure TPolyEditor.PasteItemClick(Sender: TObject);
+{*
 var
   i, n: integer;
   triangle: TTriangle;
   mem: TMemoryStream;
   handle: HGLOBAL;
   size: DWORD;
+*}
 
 begin
+{*
   if Clipboard.HasFormat(MainForm.PolygonClipForm) then
   begin
     // Open the clipboard
@@ -928,6 +932,7 @@ begin
 
     PaintBox.Refresh;
   end;
+*}
 end;
 
 procedure TPolyEditor.GridItemClick(Sender: TObject);
